@@ -3663,22 +3663,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 740490875}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 85d8465ac752aa84aaae4324a36d7d01, type: 3}
+  m_Script: {fileID: 11500000, guid: 7edf066c5a5d2974a97db71338605307, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   gridBase: {fileID: 740490876}
   floor: {fileID: 71350772}
-  obstacleLayers:
-  - {fileID: 533438595}
-  nodePrefab: {fileID: 7966741555453438692, guid: 867caef0a08cacb49ae98cb2b4b4a066,
-    type: 3}
-  offsetX: 0
-  offsetY: 0
   scanStartX: -50
   scanStartY: -50
   scanFinishX: 50
   scanFinishY: 50
-  unsortedNodes: []
   gridBoundX: 0
   gridBoundY: 0
   unwalkableNodeBorder: 1

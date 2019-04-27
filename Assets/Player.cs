@@ -8,18 +8,44 @@ public class Player : MonoBehaviour
     [SerializeField]
     GameObject _target;
 
+    NavNode currentNodePosition;
+
+    List<NavNode> pathing;
+    Coroutine pathingCoroutine;
 
     // Start is called before the first frame update
     void Start()
     {
+        // get current position on node grid
+        currentNodePosition = NavigationGrid.Instance.GetNode(new Vector2(transform.position.x, transform.position.y));
+        Debug.Log(currentNodePosition);
+        NavNode.OnNodeClicked += HandleNodeClicked;
     }
 
     // Update is called once per frame
-    void Update()
+    IEnumerator Pathing()
     {
-        if (_target)
+        while (pathing.Count > 0)
         {
-            // move
+            currentNodePosition = pathing[0];
+            transform.position = currentNodePosition.WorldPosition;
+            pathing.RemoveAt(0);
+            yield return new WaitForSeconds(0.25f);
         }
+    }
+
+    void HandleNodeClicked(NavNode clickedNavNode)
+    {
+        pathing = NavigationGrid.Instance.CalculatePath(currentNodePosition, clickedNavNode);
+        // foreach (NavNode n in pathing)
+        // {
+        //     Debug.Log(n.WorldPosition);
+        // }
+
+        if (pathingCoroutine != null)
+        {
+            StopCoroutine(pathingCoroutine);
+        }
+        pathingCoroutine = StartCoroutine(Pathing());
     }
 }
