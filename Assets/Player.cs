@@ -48,4 +48,24 @@ public class Player : MonoBehaviour
         }
         pathingCoroutine = StartCoroutine(Pathing());
     }
+
+    void OnDrawGizmos()
+    {
+        if (pathing == null)
+            return;
+
+        for (int i = 0; i < pathing.Count; i++)
+        {
+            if (i == 0)
+            {
+                Gizmos.color = Color.green;
+                Gizmos.DrawLine(currentNodePosition.WorldPosition, pathing[i].WorldPosition);
+            }
+            else
+            {
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawLine(pathing[i-1].WorldPosition, pathing[i].WorldPosition);
+            }
+        }
+    }
 }

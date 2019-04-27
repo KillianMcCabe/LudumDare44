@@ -72,6 +72,7 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
     void OnDrawGizmos()
     {
         Gizmos.color = walkable ? Color.white : Color.red;
-        Gizmos.DrawSphere(transform.position, 0.25f);
+        Gizmos.DrawWireCube(transform.position, new Vector3(0.9f, 0.9f, 0.9f));
+        // Gizmos.DrawSphere(transform.position, 0.25f);
     }
 }
