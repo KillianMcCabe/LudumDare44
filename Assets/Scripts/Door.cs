@@ -48,14 +48,14 @@ public class Door : InteractableObject
             if (Player.Instance.HasKey)
             {
                 currentNodePosition.InteractableObject = null;
-                MessageLogController.Instance.AddMessage("You unlocked the door using a key");
+                MessageLogController.Instance.AddMessage("You unlocked the door using a key.");
                 locked = false;
                 IsBlocking = false;
                 _spriteRenderer.sprite = _unlockedSprite;
             }
             else
             {
-                MessageLogController.Instance.AddMessage("The door is locked");
+                MessageLogController.Instance.AddMessage("The door is locked.");
             }
         }
     }

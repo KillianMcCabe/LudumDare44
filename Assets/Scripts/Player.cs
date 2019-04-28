@@ -3,13 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class Player : MonoBehaviour
+public class Player : Mob
 {
-    [SerializeField]
-    GameObject _target;
-
     NavNode currentNodePosition;
-
     List<NavNode> pathing;
     Coroutine pathingCoroutine;
 
@@ -17,6 +13,13 @@ public class Player : MonoBehaviour
     public static Player Instance;
 
     int strength = 5;
+    int armor = 2;
+    int health = 10;
+
+    public NavNode NodePosition
+    {
+        get { return currentNodePosition; }
+    }
 
     /// <summary>
     /// Awake is called when the script instance is being loaded.
@@ -38,12 +41,28 @@ public class Player : MonoBehaviour
     {
         // get current position on node grid
         currentNodePosition = NavigationGrid.Instance.GetNode(new Vector2(transform.position.x, transform.position.y));
+        currentNodePosition.Mob = this;
+
         Debug.Log("Player is at " + currentNodePosition);
+
         NavNode.OnNodeClicked += HandleNodeClicked;
     }
 
+    public override void ReceiveAttack(int attackPower)
+    {
+        int damage = Mathf.Max(attackPower - armor, 0);
+        health -= damage;
+        MessageLogController.Instance.AddMessage($"You received {damage} damage!", MessageLogController.MessageType.Warning);
+
+        if (health <= 0)
+        {
+            MessageLogController.Instance.AddMessage("You died.", MessageLogController.MessageType.Warning);
+            GameManager.Instance.GameOver();
+        }
+    }
+
     // Update is called once per frame
-    IEnumerator Pathing()
+    private IEnumerator Pathing()
     {
         while (pathing.Count > 0)
         {
@@ -55,19 +74,30 @@ public class Player : MonoBehaviour
             if (nextNode.InteractableObject != null && nextNode.InteractableObject.IsBlocking)
             {
                 nextNode.InteractableObject.Interact();
+
+                // notify GameManager that players turn has ended
+                GameManager.Instance.playersTurn = false;
+
                 yield break;
             }
             // check if the path is blocked by an enemy
-            else if (nextNode.Enemy != null)
+            else if (nextNode.Mob != null)
             {
-                nextNode.Enemy.DealDamage(strength);
+                nextNode.Mob.ReceiveAttack(strength);
+
+                // notify GameManager that players turn has ended
+                GameManager.Instance.playersTurn = false;
+
                 yield break;
             }
             else
             {
+                currentNodePosition.Mob = null;
                 currentNodePosition = nextNode;
+                currentNodePosition.Mob = this;
                 transform.position = currentNodePosition.WorldPosition;
             }
+
             yield return new WaitForSeconds(0.25f);
         }
 
@@ -76,21 +106,18 @@ public class Player : MonoBehaviour
         {
             currentNodePosition.InteractableObject.Interact();
         }
+
+        // notify GameManager that players turn has ended
+        GameManager.Instance.playersTurn = false;
     }
 
-    void HandleNodeClicked(NavNode clickedNavNode)
+    private void HandleNodeClicked(NavNode clickedNavNode)
     {
-        pathing = NavigationGrid.Instance.CalculatePath(currentNodePosition, clickedNavNode);
-
-        if (pathingCoroutine != null)
+        if (!GameManager.Instance.playersTurn)
         {
-            StopCoroutine(pathingCoroutine);
+            return;
         }
-        pathingCoroutine = StartCoroutine(Pathing());
-    }
 
-    void HandleDoorClicked(NavNode clickedNavNode)
-    {
         pathing = NavigationGrid.Instance.CalculatePath(currentNodePosition, clickedNavNode);
 
         if (pathingCoroutine != null)
