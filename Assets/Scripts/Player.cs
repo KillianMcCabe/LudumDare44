@@ -11,6 +11,7 @@ public class Player : Mob
 
     public bool HasKey = false;
     public static Player Instance;
+    public bool acceptingInput = true;
 
     int strength = 5;
     int armor = 2;
@@ -44,6 +45,8 @@ public class Player : Mob
         currentNodePosition.Mob = this;
 
         Debug.Log("Player is at " + currentNodePosition);
+        
+        acceptingInput = true;
 
         NavNode.OnNodeClicked += HandleNodeClicked;
     }
@@ -113,7 +116,7 @@ public class Player : Mob
 
     private void HandleNodeClicked(NavNode clickedNavNode)
     {
-        if (!GameManager.Instance.playersTurn)
+        if (!GameManager.Instance.playersTurn || !acceptingInput)
         {
             return;
         }
