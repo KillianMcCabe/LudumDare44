@@ -205,7 +205,8 @@ public class NavigationGrid : MonoBehaviour
         }
 
         path = RetracePath(startNode, targetNode);
-        path.Reverse();
+        if (path != null)
+            path.Reverse();
 
         return path;
     }
@@ -232,6 +233,10 @@ public class NavigationGrid : MonoBehaviour
 
         while (currentNode != startNode)
         {
+            if (currentNode.parent == null)
+            {
+                return null;
+            }
             path.Add(currentNode);
             currentNode = currentNode.parent;
         }

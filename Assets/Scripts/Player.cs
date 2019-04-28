@@ -45,7 +45,7 @@ public class Player : Mob
         currentNodePosition.Mob = this;
 
         Debug.Log("Player is at " + currentNodePosition);
-        
+
         acceptingInput = true;
 
         NavNode.OnNodeClicked += HandleNodeClicked;
@@ -122,12 +122,14 @@ public class Player : Mob
         }
 
         pathing = NavigationGrid.Instance.CalculatePath(currentNodePosition, clickedNavNode);
-
-        if (pathingCoroutine != null)
+        if (pathing != null)
         {
-            StopCoroutine(pathingCoroutine);
+            if (pathingCoroutine != null)
+            {
+                StopCoroutine(pathingCoroutine);
+            }
+            pathingCoroutine = StartCoroutine(Pathing());
         }
-        pathingCoroutine = StartCoroutine(Pathing());
     }
 
     void OnDrawGizmos()
