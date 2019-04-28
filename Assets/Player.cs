@@ -13,6 +13,24 @@ public class Player : MonoBehaviour
     List<NavNode> pathing;
     Coroutine pathingCoroutine;
 
+    public bool HasKey = false;
+    public static Player Instance;
+
+    /// <summary>
+    /// Awake is called when the script instance is being loaded.
+    /// </summary>
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -20,6 +38,7 @@ public class Player : MonoBehaviour
         currentNodePosition = NavigationGrid.Instance.GetNode(new Vector2(transform.position.x, transform.position.y));
         Debug.Log(currentNodePosition);
         NavNode.OnNodeClicked += HandleNodeClicked;
+        // InteractableObject.OnNodeClicked += HandleNodeClicked;
     }
 
     // Update is called once per frame
@@ -27,9 +46,25 @@ public class Player : MonoBehaviour
     {
         while (pathing.Count > 0)
         {
-            currentNodePosition = pathing[0];
-            transform.position = currentNodePosition.WorldPosition;
+            // pop
+            NavNode nextNode = pathing[0];
             pathing.RemoveAt(0);
+
+            if (nextNode.InteractableObject != null && nextNode.InteractableObject.IsBlocking)
+            {
+                nextNode.InteractableObject.Interact();
+                yield break;
+            }
+            else
+            {
+                // check if we're on the last step and it's interactable
+                if (pathing.Count == 0 && nextNode.InteractableObject != null)
+                {
+                    nextNode.InteractableObject.Interact();
+                }
+                currentNodePosition = nextNode;
+                transform.position = currentNodePosition.WorldPosition;
+            }
             yield return new WaitForSeconds(0.25f);
         }
     }
@@ -41,6 +76,17 @@ public class Player : MonoBehaviour
         // {
         //     Debug.Log(n.WorldPosition);
         // }
+
+        if (pathingCoroutine != null)
+        {
+            StopCoroutine(pathingCoroutine);
+        }
+        pathingCoroutine = StartCoroutine(Pathing());
+    }
+
+    void HandleDoorClicked(NavNode clickedNavNode)
+    {
+        pathing = NavigationGrid.Instance.CalculatePath(currentNodePosition, clickedNavNode);
 
         if (pathingCoroutine != null)
         {

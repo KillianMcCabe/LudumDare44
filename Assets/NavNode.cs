@@ -14,6 +14,7 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
     public bool walkable = true;
     public List<NavNode> neighbours;
     public NavNode parent;
+    public InteractableObject InteractableObject;
     int heapIndex;
 
     public Vector2 WorldPosition

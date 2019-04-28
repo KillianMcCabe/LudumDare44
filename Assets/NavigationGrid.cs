@@ -16,6 +16,7 @@ public class NavigationGrid : MonoBehaviour
     GameObject _nodeGridParent;
 
     public static NavigationGrid Instance;
+    LayerMask _collisionLayerMask;
 
     void Awake()
     {
@@ -28,6 +29,7 @@ public class NavigationGrid : MonoBehaviour
             Destroy(gameObject);
         }
 
+        _collisionLayerMask = LayerMask.GetMask("TileMap");
         _nodeGridParent = new GameObject("Node Grid");
         GenerateNodes(); // TODO: Calculate this in Editor
     }
@@ -58,7 +60,7 @@ public class NavigationGrid : MonoBehaviour
                     navNode.transform.SetParent(_nodeGridParent.transform);
                     navNode.worldPosX = x;
                     navNode.worldPosY = y;
-                    if (Physics2D.OverlapCircle(new Vector3(x, y), 0.25f))
+                    if (Physics2D.OverlapCircle(new Vector3(x, y), 0.25f, _collisionLayerMask))
                     {
                         navNode.walkable = false;
                     }
