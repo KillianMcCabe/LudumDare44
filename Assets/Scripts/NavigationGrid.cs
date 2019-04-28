@@ -6,7 +6,6 @@ using UnityEngine.Tilemaps;
 public class NavigationGrid : MonoBehaviour
 {
     public Grid gridBase;
-    public Tilemap floor;
 
     //these are the bounds of where we are searching in the world for tiles, have to use world coords to check for tiles in the tile map
     public int scanStartX = -250, scanStartY = -250, scanFinishX = 250, scanFinishY = 250;
@@ -50,40 +49,35 @@ public class NavigationGrid : MonoBehaviour
         {
             for (int y = scanStartY; y < scanFinishY; y++)
             {
-                // check if we have a floor tile at that world coords
-                TileBase floorTileBase = floor.GetTile(new Vector3Int(x, y, 0));
-                if (floorTileBase != null)
+                GameObject node = new GameObject("Nav Node");
+                node.transform.position = new Vector3(x + gridBase.transform.position.x, y + gridBase.transform.position.y, 0);
+                NavNode navNode = node.AddComponent<NavNode>();
+                navNode.transform.SetParent(_nodeGridParent.transform);
+                navNode.worldPosX = x;
+                navNode.worldPosY = y;
+                if (Physics2D.OverlapCircle(new Vector3(x, y), 0.25f, _collisionLayerMask))
                 {
-                    GameObject node = new GameObject("Nav Node");
-                    node.transform.position = new Vector3(x + gridBase.transform.position.x, y + gridBase.transform.position.y, 0);
-                    NavNode navNode = node.AddComponent<NavNode>();
-                    navNode.transform.SetParent(_nodeGridParent.transform);
-                    navNode.worldPosX = x;
-                    navNode.worldPosY = y;
-                    if (Physics2D.OverlapCircle(new Vector3(x, y), 0.25f, _collisionLayerMask))
-                    {
-                        navNode.walkable = false;
-                    }
+                    navNode.walkable = false;
+                }
 
-                    unsortedNodes.Add(navNode);
+                unsortedNodes.Add(navNode);
 
-                    // update gridBounds
-                    if (navNode.worldPosX < gridMinWorldX)
-                    {
-                        gridMinWorldX = navNode.worldPosX;
-                    }
-                    if (navNode.worldPosX > gridMaxWorldX)
-                    {
-                        gridMaxWorldX = navNode.worldPosX;
-                    }
-                    if (navNode.worldPosY < gridMinWorldY)
-                    {
-                        gridMinWorldY = navNode.worldPosY;
-                    }
-                    if (navNode.worldPosY > gridMaxWorldY)
-                    {
-                        gridMaxWorldY = navNode.worldPosY;
-                    }
+                // update gridBounds
+                if (navNode.worldPosX < gridMinWorldX)
+                {
+                    gridMinWorldX = navNode.worldPosX;
+                }
+                if (navNode.worldPosX > gridMaxWorldX)
+                {
+                    gridMaxWorldX = navNode.worldPosX;
+                }
+                if (navNode.worldPosY < gridMinWorldY)
+                {
+                    gridMinWorldY = navNode.worldPosY;
+                }
+                if (navNode.worldPosY > gridMaxWorldY)
+                {
+                    gridMaxWorldY = navNode.worldPosY;
                 }
             }
         }
