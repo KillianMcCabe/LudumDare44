@@ -36,9 +36,8 @@ public class Player : MonoBehaviour
     {
         // get current position on node grid
         currentNodePosition = NavigationGrid.Instance.GetNode(new Vector2(transform.position.x, transform.position.y));
-        Debug.Log(currentNodePosition);
+        Debug.Log("Player is at " + currentNodePosition);
         NavNode.OnNodeClicked += HandleNodeClicked;
-        // InteractableObject.OnNodeClicked += HandleNodeClicked;
     }
 
     // Update is called once per frame
@@ -72,10 +71,6 @@ public class Player : MonoBehaviour
     void HandleNodeClicked(NavNode clickedNavNode)
     {
         pathing = NavigationGrid.Instance.CalculatePath(currentNodePosition, clickedNavNode);
-        // foreach (NavNode n in pathing)
-        // {
-        //     Debug.Log(n.WorldPosition);
-        // }
 
         if (pathingCoroutine != null)
         {
