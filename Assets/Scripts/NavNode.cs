@@ -15,6 +15,7 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
     public List<NavNode> neighbours;
     public NavNode parent;
     public InteractableObject InteractableObject;
+    public Enemy Enemy;
     int heapIndex;
 
     public Vector2 WorldPosition

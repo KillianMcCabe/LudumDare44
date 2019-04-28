@@ -24,7 +24,7 @@ public class Key : InteractableObject
     {
         Player.Instance.HasKey = true;
         currentNodePosition.InteractableObject = null;
-        Debug.Log("You found a key");
+        MessageLogController.Instance.AddMessage("You found a key");
         GameObject.Destroy(gameObject);
     }
 }

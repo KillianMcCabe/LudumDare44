@@ -16,6 +16,8 @@ public class Player : MonoBehaviour
     public bool HasKey = false;
     public static Player Instance;
 
+    int strength = 5;
+
     /// <summary>
     /// Awake is called when the script instance is being loaded.
     /// </summary>
@@ -49,22 +51,30 @@ public class Player : MonoBehaviour
             NavNode nextNode = pathing[0];
             pathing.RemoveAt(0);
 
+            // check if the path is blocked by an object e.g. door
             if (nextNode.InteractableObject != null && nextNode.InteractableObject.IsBlocking)
             {
                 nextNode.InteractableObject.Interact();
                 yield break;
             }
+            // check if the path is blocked by an enemy
+            else if (nextNode.Enemy != null)
+            {
+                nextNode.Enemy.DealDamage(strength);
+                yield break;
+            }
             else
             {
-                // check if we're on the last step and it's interactable
-                if (pathing.Count == 0 && nextNode.InteractableObject != null)
-                {
-                    nextNode.InteractableObject.Interact();
-                }
                 currentNodePosition = nextNode;
                 transform.position = currentNodePosition.WorldPosition;
             }
             yield return new WaitForSeconds(0.25f);
+        }
+
+        // check if we stopped on an item
+        if (currentNodePosition.InteractableObject != null)
+        {
+            currentNodePosition.InteractableObject.Interact();
         }
     }
 
