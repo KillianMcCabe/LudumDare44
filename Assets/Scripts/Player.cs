@@ -54,8 +54,6 @@ public class Player : Mob
 
         acceptingInput = true;
 
-        // NavigationGrid.Instance.CalculateLighting();
-
         NavNode.OnNodeClicked += HandleNodeClicked;
     }
 

@@ -45,6 +45,12 @@ public class GameManager : MonoBehaviour
         // _navigationGrid.GenerateNodes(level);
     }
 
+    IEnumerator Start()
+    {
+        yield return null;
+        NavigationGrid.Instance.CalculateLighting();
+    }
+
     //Update is called every frame.
     void Update()
     {

@@ -5,6 +5,8 @@ using UnityEngine.Tilemaps;
 
 public class NavigationGrid : MonoBehaviour
 {
+    const float LightRange = 8;
+
     public Grid gridBase;
 
     [SerializeField]
@@ -19,8 +21,8 @@ public class NavigationGrid : MonoBehaviour
 
     public static NavigationGrid Instance;
     LayerMask _collisionLayerMask;
-    LayerMask _navNodeWallLayerMask;
     LayerMask _navNodeFloorLayerMask;
+    LayerMask _navNodeWallLayerMask;
 
     void Awake()
     {
@@ -34,8 +36,8 @@ public class NavigationGrid : MonoBehaviour
         }
 
         _collisionLayerMask = LayerMask.GetMask("TileMap");
-        _navNodeWallLayerMask = LayerMask.GetMask("NavNode_Wall");
         _navNodeFloorLayerMask = LayerMask.GetMask("NavNode_Floor");
+        _navNodeWallLayerMask = LayerMask.GetMask("NavNode_Wall");
         _nodeGridParent = new GameObject("Node Grid");
         GenerateNodes(); // TODO: Calculate this in Editor
     }
@@ -126,29 +128,50 @@ public class NavigationGrid : MonoBehaviour
 
     public void CalculateLighting()
     {
-        const float LightRange = 8;
+        // check for lit floor tiles
         foreach (NavNode n in nodeGrid)
         {
-            if (n != null)
+            if (n != null && n.Walkable)
             {
                 float dist = Vector2.Distance(Player.Instance.WorldPosition, n.WorldPosition);
+                // check if outside light range
                 if (dist > LightRange)
                 {
                     n.Visible = false;
                 }
                 else
                 {
+                    // check if within light of sight from player
                     RaycastHit2D hit = Physics2D.Raycast(Player.Instance.WorldPosition, (n.WorldPosition - Player.Instance.WorldPosition).normalized, dist, _navNodeWallLayerMask);
-                    if (hit.collider != null && hit.collider.transform != n.transform)
-                    {
-                        Debug.DrawLine(Player.Instance.WorldPosition, hit.collider.transform.position, Color.yellow, 2f);
-                        n.Visible = false;
-                    }
-                    else
+                    if (hit.collider == null)
                     {
                         n.Visible = true;
                     }
+                    else
+                    {
+                        // Debug.DrawLine(Player.Instance.WorldPosition, hit.collider.transform.position, Color.red, 2f);
+                        n.Visible = false;
+                    }
                 }
+            }
+        }
+
+        // light up walls adjacent to lit floor tiles
+        foreach (NavNode n in nodeGrid)
+        {
+            if (n != null && !n.Walkable)
+            {
+                // check if neighbour is lit
+                bool foundVisibleNeighbour = false;
+                foreach (NavNode neighbour in n.neighbours)
+                {
+                    if (neighbour.Walkable && neighbour.Visible)
+                    {
+                        foundVisibleNeighbour = true;
+                        break;
+                    }
+                }
+                n.Visible = foundVisibleNeighbour;
             }
         }
     }

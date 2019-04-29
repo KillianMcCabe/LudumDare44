@@ -22,7 +22,6 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
     bool _walkable = true;
 
     SpriteRenderer _spriteRenderer;
-    BoxCollider2D _boxCollider;
 
     public bool Walkable
     {
@@ -81,7 +80,6 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
     void Awake()
     {
         _spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
-        _boxCollider = gameObject.GetComponent<BoxCollider2D>();
     }
 
     public int fCost
