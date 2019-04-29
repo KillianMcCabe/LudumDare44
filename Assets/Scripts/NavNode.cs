@@ -11,12 +11,64 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
     public int hCost;
     public int gridX, gridY;
     public int worldPosX, worldPosY;
-    public bool walkable = true;
     public List<NavNode> neighbours;
     public NavNode parent;
     public InteractableObject InteractableObject;
     public Mob Mob;
+
     int heapIndex;
+    bool _visible = true;
+    bool _hasBeenSeen = false;
+    bool _walkable = true;
+
+    SpriteRenderer _spriteRenderer;
+    BoxCollider2D _boxCollider;
+
+    public bool Walkable
+    {
+        get { return _walkable; }
+        set {
+            _walkable = value;
+
+            if (_walkable)
+            {
+                gameObject.layer = LayerMask.NameToLayer("NavNode_Floor");
+            }
+            else
+            {
+                gameObject.layer = LayerMask.NameToLayer("NavNode_Wall");
+            }
+        }
+    }
+
+    public bool Visible
+    {
+        get { return _visible; }
+        set {
+            _visible = value;
+            if (_visible)
+            {
+                _hasBeenSeen = true;
+            }
+
+            // set tile shadow color
+            if (!_visible)
+            {
+                if (_hasBeenSeen)
+                {
+                    _spriteRenderer.color = new Color(0, 0, 0, 0.5f); // remembered
+                }
+                else
+                {
+                    _spriteRenderer.color = new Color(0, 0, 0, 1); // blacked out
+                }
+            }
+            else
+            {
+                _spriteRenderer.color = new Color(0, 0, 0, 0); // visible
+            }
+        }
+    }
 
     public Vector2 WorldPosition
     {
@@ -26,13 +78,10 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
     /// <summary>
     /// Awake is called when the script instance is being loaded.
     /// </summary>
-    void Start()
+    void Awake()
     {
-        if (walkable)
-        {
-            BoxCollider2D box = gameObject.AddComponent<BoxCollider2D>();
-            box.size = new Vector2(1, 1);
-        }
+        _spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+        _boxCollider = gameObject.GetComponent<BoxCollider2D>();
     }
 
     public int fCost
@@ -73,8 +122,7 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
 
     void OnDrawGizmos()
     {
-        Gizmos.color = walkable ? Color.white : Color.red;
+        Gizmos.color = _walkable ? Color.white : Color.red;
         Gizmos.DrawWireCube(transform.position, new Vector3(0.9f, 0.9f, 0.9f));
-        // Gizmos.DrawSphere(transform.position, 0.25f);
     }
 }

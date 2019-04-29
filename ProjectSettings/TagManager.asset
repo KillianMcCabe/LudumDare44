@@ -14,8 +14,8 @@ TagManager:
   - 
   - 
   - TileMap
-  - 
-  - 
+  - NavNode_Wall
+  - NavNode_Floor
   - 
   - 
   - 

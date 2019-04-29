@@ -3724,6 +3724,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gridBase: {fileID: 740490876}
+  _nodePrefab: {fileID: 7463786660901052157, guid: e01b6132aa797fb4290cc37e96693109,
+    type: 3}
   scanStartX: -10
   scanStartY: -10
   scanFinishX: 20

@@ -7,6 +7,9 @@ public class NavigationGrid : MonoBehaviour
 {
     public Grid gridBase;
 
+    [SerializeField]
+    GameObject _nodePrefab;
+
     //these are the bounds of where we are searching in the world for tiles, have to use world coords to check for tiles in the tile map
     public int scanStartX = -250, scanStartY = -250, scanFinishX = 250, scanFinishY = 250;
 
@@ -16,6 +19,8 @@ public class NavigationGrid : MonoBehaviour
 
     public static NavigationGrid Instance;
     LayerMask _collisionLayerMask;
+    LayerMask _navNodeWallLayerMask;
+    LayerMask _navNodeFloorLayerMask;
 
     void Awake()
     {
@@ -29,6 +34,8 @@ public class NavigationGrid : MonoBehaviour
         }
 
         _collisionLayerMask = LayerMask.GetMask("TileMap");
+        _navNodeWallLayerMask = LayerMask.GetMask("NavNode_Wall");
+        _navNodeFloorLayerMask = LayerMask.GetMask("NavNode_Floor");
         _nodeGridParent = new GameObject("Node Grid");
         GenerateNodes(); // TODO: Calculate this in Editor
     }
@@ -49,15 +56,20 @@ public class NavigationGrid : MonoBehaviour
         {
             for (int y = scanStartY; y < scanFinishY; y++)
             {
-                GameObject node = new GameObject("Nav Node");
+                // GameObject node = new GameObject("Nav Node");
+                GameObject node = Instantiate(_nodePrefab);
                 node.transform.position = new Vector3(x + gridBase.transform.position.x, y + gridBase.transform.position.y, 0);
-                NavNode navNode = node.AddComponent<NavNode>();
+                NavNode navNode = node.GetComponent<NavNode>();
                 navNode.transform.SetParent(_nodeGridParent.transform);
                 navNode.worldPosX = x;
                 navNode.worldPosY = y;
                 if (Physics2D.OverlapCircle(new Vector3(x, y), 0.25f, _collisionLayerMask))
                 {
-                    navNode.walkable = false;
+                    navNode.Walkable = false;
+                }
+                else
+                {
+                    navNode.Walkable = true;
                 }
 
                 unsortedNodes.Add(navNode);
@@ -107,6 +119,35 @@ public class NavigationGrid : MonoBehaviour
                 {
                     NavNode navNode = nodeGrid[x, y];
                     navNode.neighbours = GetNeighbours(navNode);
+                }
+            }
+        }
+    }
+
+    public void CalculateLighting()
+    {
+        const float LightRange = 8;
+        foreach (NavNode n in nodeGrid)
+        {
+            if (n != null)
+            {
+                float dist = Vector2.Distance(Player.Instance.WorldPosition, n.WorldPosition);
+                if (dist > LightRange)
+                {
+                    n.Visible = false;
+                }
+                else
+                {
+                    RaycastHit2D hit = Physics2D.Raycast(Player.Instance.WorldPosition, (n.WorldPosition - Player.Instance.WorldPosition).normalized, dist, _navNodeWallLayerMask);
+                    if (hit.collider != null && hit.collider.transform != n.transform)
+                    {
+                        Debug.DrawLine(Player.Instance.WorldPosition, hit.collider.transform.position, Color.yellow, 2f);
+                        n.Visible = false;
+                    }
+                    else
+                    {
+                        n.Visible = true;
+                    }
                 }
             }
         }
@@ -165,7 +206,7 @@ public class NavigationGrid : MonoBehaviour
     {
         List<NavNode> path = new List<NavNode>();
 
-        if (startNode.walkable && targetNode.walkable)
+        if (startNode.Walkable && targetNode.Walkable)
         {
             Heap<NavNode> openSet = new Heap<NavNode>(nodeGrid.Length);
             HashSet<NavNode> closedSet = new HashSet<NavNode>();
@@ -183,7 +224,7 @@ public class NavigationGrid : MonoBehaviour
 
                 foreach (NavNode neighbour in currentNode.neighbours)
                 {
-                    if (!neighbour.walkable || closedSet.Contains(neighbour))
+                    if (!neighbour.Walkable || closedSet.Contains(neighbour))
                     {
                         continue;
                     }

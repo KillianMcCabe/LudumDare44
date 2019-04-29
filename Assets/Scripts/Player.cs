@@ -22,6 +22,12 @@ public class Player : Mob
         get { return currentNodePosition; }
     }
 
+    public Vector2 WorldPosition
+    {
+        get { return transform.position; }
+        // get { return currentNodePosition.WorldPosition; }
+    }
+
     /// <summary>
     /// Awake is called when the script instance is being loaded.
     /// </summary>
@@ -47,6 +53,8 @@ public class Player : Mob
         Debug.Log("Player is at " + currentNodePosition);
 
         acceptingInput = true;
+
+        // NavigationGrid.Instance.CalculateLighting();
 
         NavNode.OnNodeClicked += HandleNodeClicked;
     }
@@ -100,6 +108,8 @@ public class Player : Mob
                 currentNodePosition.Mob = this;
                 transform.position = currentNodePosition.WorldPosition;
             }
+
+            NavigationGrid.Instance.CalculateLighting();
 
             yield return new WaitForSeconds(0.25f);
         }
