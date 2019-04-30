@@ -3730,8 +3730,10 @@ MonoBehaviour:
   scanStartY: -10
   scanFinishX: 20
   scanFinishY: 20
-  gridBoundX: 0
-  gridBoundY: 0
+  navGridSizeX: 0
+  navGridSizeY: 0
+  lightGridSizeX: 0
+  lightGridSizeY: 0
 --- !u!1 &825467771
 GameObject:
   m_ObjectHideFlags: 0
@@ -4348,7 +4350,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 2
-  m_Size: {x: 26, y: 21}
+  m_Size: {x: 25, y: 21}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1

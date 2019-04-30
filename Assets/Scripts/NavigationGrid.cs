@@ -16,6 +16,7 @@ public class NavigationGrid : MonoBehaviour
     public int scanStartX = -250, scanStartY = -250, scanFinishX = 250, scanFinishY = 250;
 
     NavNode[,] nodeGrid;            // sorted 2d array of nodes, may contain null entries if the map is of an odd shape e.g. gaps
+    LightNode[,] lightNodeGrid;
 
     GameObject _nodeGridParent;
 
@@ -42,7 +43,9 @@ public class NavigationGrid : MonoBehaviour
         GenerateNodes(); // TODO: Calculate this in Editor
     }
 
-    public int gridBoundX = 0, gridBoundY = 0;
+    public int navGridSizeX = 0, navGridSizeY = 0;
+    public int lightGridSizeX = 0, lightGridSizeY = 0;
+
     int gridMinWorldX = int.MaxValue;
     int gridMaxWorldX = int.MinValue;
 
@@ -96,11 +99,11 @@ public class NavigationGrid : MonoBehaviour
             }
         }
 
-        gridBoundX = gridMaxWorldX - gridMinWorldX;
-        gridBoundY = gridMaxWorldY - gridMinWorldY;
+        navGridSizeX = gridMaxWorldX - gridMinWorldX;
+        navGridSizeY = gridMaxWorldY - gridMinWorldY;
 
         // go through the unsorted list of nodes and put them into the 2d array in the correct position
-        nodeGrid = new NavNode[gridBoundX + 1, gridBoundY + 1];
+        nodeGrid = new NavNode[navGridSizeX + 1, navGridSizeY + 1];
         foreach (NavNode navNode in unsortedNodes)
         {
             int x = navNode.worldPosX - gridMinWorldX;
@@ -113,9 +116,9 @@ public class NavigationGrid : MonoBehaviour
         }
 
         // assign neighbours to each node in 2d grid
-        for (int x = 0; x < gridBoundX; x++)
+        for (int x = 0; x < navGridSizeX; x++)
         {
-            for (int y = 0; y < gridBoundY; y++)
+            for (int y = 0; y < navGridSizeY; y++)
             {
                 if (nodeGrid[x, y] != null)
                 {
@@ -124,54 +127,70 @@ public class NavigationGrid : MonoBehaviour
                 }
             }
         }
+
+        GenerateLightGrid();
+    }
+
+    private void GenerateLightGrid()
+    {
+        lightGridSizeX = navGridSizeX - 1;
+        lightGridSizeY = navGridSizeY - 1;
+        lightNodeGrid = new LightNode[lightGridSizeX, lightGridSizeY];
+
+        for (int x = 0; x < lightGridSizeX; x++)
+        {
+            for (int y = 0; y < lightGridSizeY; y++)
+            {
+                LightNode newLightNode = new LightNode();
+                newLightNode.WorldPosition = new Vector2(gridMinWorldX + x + 0.5f, gridMinWorldY + y + 0.5f);
+                newLightNode.navNodes = new List<NavNode>();
+                for (int i = 0; i <= 1; i++)
+                {
+                    for (int j = 0; j <= 1; j++)
+                    {
+                        if (nodeGrid[x + i, y + j] != null)
+                            newLightNode.navNodes.Add(nodeGrid[x + i, y + j]);
+                    }
+                }
+                lightNodeGrid[x, y] = newLightNode;
+            }
+        }
     }
 
     public void CalculateLighting()
     {
-        // check for lit floor tiles
-        foreach (NavNode n in nodeGrid)
+        // start by setting all nodes to dark
+        foreach (NavNode navNode in nodeGrid)
         {
-            if (n != null && n.Walkable)
+            if (navNode != null)
             {
-                float dist = Vector2.Distance(Player.Instance.WorldPosition, n.WorldPosition);
-                // check if outside light range
-                if (dist > LightRange)
-                {
-                    n.Visible = false;
-                }
-                else
-                {
-                    // check if within light of sight from player
-                    RaycastHit2D hit = Physics2D.Raycast(Player.Instance.WorldPosition, (n.WorldPosition - Player.Instance.WorldPosition).normalized, dist, _navNodeWallLayerMask);
-                    if (hit.collider == null)
-                    {
-                        n.Visible = true;
-                    }
-                    else
-                    {
-                        // Debug.DrawLine(Player.Instance.WorldPosition, hit.collider.transform.position, Color.red, 2f);
-                        n.Visible = false;
-                    }
-                }
+                navNode.Visible = false;
             }
         }
 
-        // light up walls adjacent to lit floor tiles
-        foreach (NavNode n in nodeGrid)
+        // check all light nodes
+        foreach (LightNode lightNode in lightNodeGrid)
         {
-            if (n != null && !n.Walkable)
+            Vector2 towardsPlayer = Player.Instance.WorldPosition - lightNode.WorldPosition;
+            float dist = towardsPlayer.magnitude;
+            // check if within light range
+            if (dist < LightRange)
             {
-                // check if neighbour is lit
-                bool foundVisibleNeighbour = false;
-                foreach (NavNode neighbour in n.neighbours)
+                // check if within light of sight from player
+                RaycastHit2D hit = Physics2D.Raycast(lightNode.WorldPosition, (towardsPlayer).normalized, towardsPlayer.magnitude, _navNodeWallLayerMask);
+                if (hit.collider == null)
                 {
-                    if (neighbour.Walkable && neighbour.Visible)
+                    // Debug.DrawLine(lightNode.WorldPosition, lightNode.WorldPosition + towardsPlayer, Color.green, 2f);
+                    foreach (NavNode n in lightNode.navNodes)
                     {
-                        foundVisibleNeighbour = true;
-                        break;
+                        n.Visible = true;
                     }
                 }
-                n.Visible = foundVisibleNeighbour;
+                else
+                {
+                    // Debug.DrawLine(lightNode.WorldPosition, hit.point, Color.red, 2f);
+                    lightNode.Visible = false;
+                }
             }
         }
     }
@@ -215,7 +234,7 @@ public class NavigationGrid : MonoBehaviour
                 int checkX = node.gridX + x;
                 int checkY = node.gridY + y;
 
-                if (checkX >= 0 && checkX < gridBoundX && checkY >= 0 && checkY < gridBoundY)
+                if (checkX >= 0 && checkX < navGridSizeX && checkY >= 0 && checkY < navGridSizeY)
                 {
                     neightbours.Add(nodeGrid[checkX, checkY]);
                 }
