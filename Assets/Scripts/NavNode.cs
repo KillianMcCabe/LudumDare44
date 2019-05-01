@@ -135,10 +135,8 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
 
     void OnMouseDown()
     {
-        Debug.Log("MouseDown on " + gridX + ", " + gridY);
         if (OnNodeClicked != null)
         {
-            Debug.Log("OnNodeClicked Invoked");
             OnNodeClicked.Invoke(this);
         }
     }

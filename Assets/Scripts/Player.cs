@@ -5,6 +5,8 @@ using UnityEngine.AI;
 
 public class Player : Mob
 {
+    const float moveSpeed = 6f;
+
     NavNode currentNodePosition;
     List<NavNode> pathing;
     Coroutine pathingCoroutine;
@@ -101,17 +103,20 @@ public class Player : Mob
             }
             else
             {
+                // move to new position
+                while (transform.position != (Vector3)nextNode.WorldPosition)
+                {
+                    transform.position = Vector2.MoveTowards(transform.position, nextNode.WorldPosition, Time.deltaTime * moveSpeed);
+                    yield return null;
+                }
+
                 currentNodePosition.Mob = null;
                 currentNodePosition = nextNode;
                 currentNodePosition.Mob = this;
                 transform.position = currentNodePosition.WorldPosition;
             }
 
-            yield return new WaitForSeconds(0.05f); // wait for collisions to update which objects block light
-            NavigationGrid.Instance.CalculateLighting();
-
-            yield return new WaitForSeconds(0.2f); // pause between each movement
-
+            NavigationGrid.Instance.CalculateLighting(); // TODO: move into GameManager.cs
         }
 
         // check if we stopped on an item
