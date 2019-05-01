@@ -54,7 +54,7 @@ public class NavigationGrid : MonoBehaviour
     int gridMaxWorldY = int.MinValue;
 
     /// Generate a grid of nodes, ready to be used by a-star algorigthm
-    void GenerateNodes()
+    private void GenerateNodes()
     {
         // scan tiles and create nodes based on where they are
         List<NavNode> unsortedNodes = new List<NavNode>();
@@ -129,10 +129,10 @@ public class NavigationGrid : MonoBehaviour
             }
         }
 
-        GenerateLightGrid();
+        InitialiseLightGrid();
     }
 
-    private void GenerateLightGrid()
+    private void InitialiseLightGrid()
     {
         lightGridSizeX = navGridSizeX - 1;
         lightGridSizeY = navGridSizeY - 1;
@@ -199,25 +199,8 @@ public class NavigationGrid : MonoBehaviour
     // retrieve the node that corresponds to the given position
     public NavNode GetNode(Vector2 pos)
     {
-        // NavNode closestNode = null;
-        // float distToClosestNode = Mathf.Infinity;
-        // foreach (NavNode n in nodeGrid)
-        // {
-        //     if (n != null)
-        //     {
-        //         Debug.Log(pos);
-        //         float dist = Vector2.Distance(pos, n.Position);
-        //         if (dist < distToClosestNode)
-        //         {
-        //             closestNode = n;
-        //             distToClosestNode = dist;
-        //         }
-        //     }
-        // }
-
         int x = (int)pos.x - gridMinWorldX;
         int y = (int)pos.y - gridMinWorldY;
-
         return nodeGrid[x, y];
     }
 
@@ -293,6 +276,33 @@ public class NavigationGrid : MonoBehaviour
             path.Reverse();
 
         return path;
+    }
+
+    public List<NavNode> GetNodesWithinRange(NavNode startNode, int range)
+    {
+        List<NavNode> result = new List<NavNode>();
+
+        // Breadth first search
+        GetNodesWithinRangeBFS(startNode, range, result, 0);
+
+        return result;
+    }
+
+    public void GetNodesWithinRangeBFS(NavNode currentNode, int range, List<NavNode> progress, int depth)
+    {
+        progress.Add(currentNode);
+
+        foreach (NavNode neighbour in currentNode.neighbours)
+        {
+            if (depth + 1 < range && neighbour.Walkable && !neighbour.Blocked && neighbour.HasBeenSeen)
+            {
+                if (!progress.Contains(neighbour) || neighbour.gCost > depth+1)
+                {
+                    neighbour.gCost = depth+1;
+                    GetNodesWithinRangeBFS(neighbour, range, progress, depth + 1);
+                }
+            }
+        }
     }
 
     private int GetDistance(NavNode nodeA, NavNode nodeB)

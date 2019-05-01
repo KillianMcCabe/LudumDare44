@@ -87,7 +87,6 @@ public class Door : InteractableObject
     /// <param name="other">The other Collider2D involved in this collision.</param>
     void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log(other.gameObject.name + " entered door");
         SetState(State.Open);
     }
 

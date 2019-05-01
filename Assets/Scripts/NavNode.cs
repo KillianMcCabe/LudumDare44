@@ -51,6 +51,11 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
         }
     }
 
+    public bool HasBeenSeen
+    {
+        get { return _hasBeenSeen; }
+    }
+
     public bool Visible
     {
         get { return _visible; }

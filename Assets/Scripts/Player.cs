@@ -9,12 +9,14 @@ public class Player : Mob
 
     NavNode currentNodePosition;
     List<NavNode> pathing;
+    List<NavNode> _nodesWithinMovementRange;
     Coroutine pathingCoroutine;
 
     public bool HasKey = false;
     public static Player Instance;
     public bool acceptingInput = true;
 
+    int speed = 6;
     int strength = 5;
     int armor = 2;
     int health = 10;
@@ -57,6 +59,13 @@ public class Player : Mob
         acceptingInput = true;
 
         NavNode.OnNodeClicked += HandleNodeClicked;
+    }
+
+    // TODO: GameManager should call this and all references to GameManager.Instance.playersTurn should be removed
+    public void StartTurn()
+    {
+        // acceptingInput = true;
+        _nodesWithinMovementRange = NavigationGrid.Instance.GetNodesWithinRange(currentNodePosition, speed);
     }
 
     public override void ReceiveAttack(int attackPower)
@@ -149,20 +158,29 @@ public class Player : Mob
 
     void OnDrawGizmos()
     {
-        if (pathing == null)
-            return;
-
-        for (int i = 0; i < pathing.Count; i++)
+        if (pathing != null)
         {
-            if (i == 0)
+            for (int i = 0; i < pathing.Count; i++)
             {
-                Gizmos.color = Color.green;
-                Gizmos.DrawLine(currentNodePosition.WorldPosition, pathing[i].WorldPosition);
+                if (i == 0)
+                {
+                    Gizmos.color = Color.green;
+                    Gizmos.DrawLine(currentNodePosition.WorldPosition, pathing[i].WorldPosition);
+                }
+                else
+                {
+                    Gizmos.color = Color.yellow;
+                    Gizmos.DrawLine(pathing[i-1].WorldPosition, pathing[i].WorldPosition);
+                }
             }
-            else
+        }
+
+        if (_nodesWithinMovementRange != null)
+        {
+            for (int i = 0; i < _nodesWithinMovementRange.Count; i++)
             {
                 Gizmos.color = Color.yellow;
-                Gizmos.DrawLine(pathing[i-1].WorldPosition, pathing[i].WorldPosition);
+                Gizmos.DrawCube(_nodesWithinMovementRange[i].WorldPosition, Vector3.one);
             }
         }
     }
