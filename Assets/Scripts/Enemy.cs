@@ -91,7 +91,7 @@ public class Enemy : Mob
             pathing.RemoveAt(0);
 
             // check if the path is blocked by an object e.g. door
-            if (nextNode.InteractableObject != null && nextNode.InteractableObject.IsBlocking)
+            if (nextNode.InteractableObject != null && nextNode.Blocked)
             {
                 isMoving = false;
                 yield break;

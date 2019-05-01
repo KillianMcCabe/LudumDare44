@@ -6,6 +6,7 @@ using UnityEngine.Tilemaps;
 public class NavigationGrid : MonoBehaviour
 {
     const float LightRange = 8;
+    private const float zPos = -1;
 
     public Grid gridBase;
 
@@ -63,7 +64,7 @@ public class NavigationGrid : MonoBehaviour
             {
                 // GameObject node = new GameObject("Nav Node");
                 GameObject node = Instantiate(_nodePrefab);
-                node.transform.position = new Vector3(x + gridBase.transform.position.x, y + gridBase.transform.position.y, 0);
+                node.transform.position = new Vector3(x + gridBase.transform.position.x, y + gridBase.transform.position.y, zPos);
                 NavNode navNode = node.GetComponent<NavNode>();
                 navNode.transform.SetParent(_nodeGridParent.transform);
                 navNode.worldPosX = x;

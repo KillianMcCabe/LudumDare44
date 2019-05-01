@@ -91,7 +91,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -119,7 +119,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf361505f6407ea48a8ab86d2b45a102, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  locked: 1
   _spriteRenderer: {fileID: 7173436362276636004}
-  _unlockedSprite: {fileID: 21300028, guid: c35be14f5e2e0c2478082be44ed95ed8, type: 3}
+  _openSprite: {fileID: 21300006, guid: c35be14f5e2e0c2478082be44ed95ed8, type: 3}
+  _closedSprite: {fileID: 21300028, guid: c35be14f5e2e0c2478082be44ed95ed8, type: 3}
   _lockedSprite: {fileID: 21300050, guid: c35be14f5e2e0c2478082be44ed95ed8, type: 3}

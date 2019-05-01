@@ -80,7 +80,7 @@ public class Player : Mob
             pathing.RemoveAt(0);
 
             // check if the path is blocked by an object e.g. door
-            if (nextNode.InteractableObject != null && nextNode.InteractableObject.IsBlocking)
+            if (nextNode.InteractableObject != null && nextNode.Blocked)
             {
                 nextNode.InteractableObject.Interact();
 
@@ -107,9 +107,11 @@ public class Player : Mob
                 transform.position = currentNodePosition.WorldPosition;
             }
 
+            yield return new WaitForSeconds(0.05f); // wait for collisions to update which objects block light
             NavigationGrid.Instance.CalculateLighting();
 
-            yield return new WaitForSeconds(0.25f);
+            yield return new WaitForSeconds(0.2f); // pause between each movement
+
         }
 
         // check if we stopped on an item

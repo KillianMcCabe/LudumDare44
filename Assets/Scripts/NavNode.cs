@@ -20,6 +20,8 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
     bool _visible = true;
     bool _hasBeenSeen = false;
     bool _walkable = true;
+    bool _blocked = false;
+    bool _blocksLight = false;
 
     SpriteRenderer _spriteRenderer;
 
@@ -28,15 +30,24 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
         get { return _walkable; }
         set {
             _walkable = value;
+            UpdateLayer();
+        }
+    }
 
-            if (_walkable)
-            {
-                gameObject.layer = LayerMask.NameToLayer("NavNode_Floor");
-            }
-            else
-            {
-                gameObject.layer = LayerMask.NameToLayer("NavNode_Wall");
-            }
+    public bool Blocked
+    {
+        get { return _blocked; }
+        set {
+            _blocked = value;
+        }
+    }
+
+    public bool BlocksLight
+    {
+        get { return _blocksLight; }
+        set {
+            _blocksLight = value;
+            UpdateLayer();
         }
     }
 
@@ -110,10 +121,24 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
         return -compare;
     }
 
+    private void UpdateLayer()
+    {
+        if (!_walkable || _blocksLight)
+        {
+            gameObject.layer = LayerMask.NameToLayer("NavNode_Wall");
+        }
+        else
+        {
+            gameObject.layer = LayerMask.NameToLayer("NavNode_Floor");
+        }
+    }
+
     void OnMouseDown()
     {
+        Debug.Log("MouseDown on " + gridX + ", " + gridY);
         if (OnNodeClicked != null)
         {
+            Debug.Log("OnNodeClicked Invoked");
             OnNodeClicked.Invoke(this);
         }
     }

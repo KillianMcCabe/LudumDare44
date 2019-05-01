@@ -10,10 +10,12 @@ public class Altar : InteractableObject
     // Start is called before the first frame update
     void Start()
     {
-        IsBlocking = true;
-
-        NavigationGrid.Instance.GetNode(new Vector2(transform.position.x,     transform.position.y)).InteractableObject = this;
-        NavigationGrid.Instance.GetNode(new Vector2(transform.position.x + 1, transform.position.y)).InteractableObject = this;;
+        NavNode node1 = NavigationGrid.Instance.GetNode(new Vector2(transform.position.x,     transform.position.y));
+        node1.InteractableObject = this;
+        node1.Blocked = true;
+        NavNode node2 = NavigationGrid.Instance.GetNode(new Vector2(transform.position.x + 1, transform.position.y));
+        node2.InteractableObject = this;
+        node2.Blocked = true;
     }
 
     public override void Interact()
