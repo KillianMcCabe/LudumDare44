@@ -294,7 +294,8 @@ public class NavigationGrid : MonoBehaviour
 
         foreach (NavNode neighbour in currentNode.neighbours)
         {
-            if (depth + 1 < range && neighbour.Walkable && !neighbour.Blocked && neighbour.HasBeenSeen)
+            // if (depth + 1 < range && neighbour.Walkable && !neighbour.Blocked && neighbour.HasBeenSeen)
+            if (depth + 1 < range && neighbour.Walkable && neighbour.HasBeenSeen)
             {
                 if (!progress.Contains(neighbour) || neighbour.gCost > depth+1)
                 {

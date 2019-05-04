@@ -23,6 +23,8 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
     bool _blocked = false;
     bool _blocksLight = false;
 
+    private Color _highlight = new Color(0, 0, 0, 0);
+
     SpriteRenderer _spriteRenderer;
 
     public bool Walkable
@@ -51,6 +53,15 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
         }
     }
 
+    public Color Highlight
+    {
+        get { return _highlight; }
+        set {
+            _highlight = value;
+            UpdateSpriteRenderer();
+        }
+    }
+
     public bool HasBeenSeen
     {
         get { return _hasBeenSeen; }
@@ -66,22 +77,7 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
                 _hasBeenSeen = true;
             }
 
-            // set tile shadow color
-            if (!_visible)
-            {
-                if (_hasBeenSeen)
-                {
-                    _spriteRenderer.color = new Color(0, 0, 0, 0.5f); // remembered
-                }
-                else
-                {
-                    _spriteRenderer.color = new Color(0, 0, 0, 1); // blacked out
-                }
-            }
-            else
-            {
-                _spriteRenderer.color = new Color(0, 0, 0, 0); // visible
-            }
+            UpdateSpriteRenderer();
         }
     }
 
@@ -135,6 +131,33 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
         else
         {
             gameObject.layer = LayerMask.NameToLayer("NavNode_Floor");
+        }
+    }
+
+    private void UpdateSpriteRenderer()
+    {
+        // set tile shadow color
+        if (!_visible)
+        {
+            if (_hasBeenSeen)
+            {
+                _spriteRenderer.color = new Color(0, 0, 0, 0.5f); // darkened
+            }
+            else
+            {
+                _spriteRenderer.color = new Color(0, 0, 0, 1); // blacked out
+            }
+        }
+        else
+        {
+            if (_highlight != Color.black)
+            {
+                _spriteRenderer.color = _highlight * new Color(1, 1, 1, 0.25f); // visible
+            }
+            else
+            {
+                _spriteRenderer.color = new Color(0, 0, 0, 0); // visible
+            }
         }
     }
 

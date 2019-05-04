@@ -49,6 +49,7 @@ public class GameManager : MonoBehaviour
     {
         yield return null;
         NavigationGrid.Instance.CalculateLighting();
+        Player.Instance.StartTurn();
     }
 
     //Update is called every frame.

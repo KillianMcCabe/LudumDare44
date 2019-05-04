@@ -5,6 +5,15 @@ using UnityEngine.AI;
 
 public class Player : Mob
 {
+    enum State
+    {
+        None,
+        WaitingForTurn,
+        DecidingWhereToMoveOrAct,
+        Moving,
+        Acting
+    }
+
     const float moveSpeed = 6f;
 
     NavNode currentNodePosition;
@@ -20,6 +29,9 @@ public class Player : Mob
     int strength = 5;
     int armor = 2;
     int health = 10;
+
+    private State _state;
+    private int movement = 0;
 
     public NavNode NodePosition
     {
@@ -61,11 +73,31 @@ public class Player : Mob
         NavNode.OnNodeClicked += HandleNodeClicked;
     }
 
+    private void SetState(State state)
+    {
+        _state = state;
+
+        switch (_state)
+        {
+            case State.DecidingWhereToMoveOrAct:
+                movement = speed;
+                _nodesWithinMovementRange = NavigationGrid.Instance.GetNodesWithinRange(currentNodePosition, movement);
+                // show highlight
+                for (int i = 0; i < _nodesWithinMovementRange.Count; i++)
+                {
+                    _nodesWithinMovementRange[i].Highlight = Color.yellow;
+                    // Gizmos.color = Color.yellow;
+                    // Gizmos.DrawCube(_nodesWithinMovementRange[i].WorldPosition, Vector3.one);
+                }
+                break;
+        }
+    }
+
     // TODO: GameManager should call this and all references to GameManager.Instance.playersTurn should be removed
     public void StartTurn()
     {
         // acceptingInput = true;
-        _nodesWithinMovementRange = NavigationGrid.Instance.GetNodesWithinRange(currentNodePosition, speed);
+        SetState(State.DecidingWhereToMoveOrAct);
     }
 
     public override void ReceiveAttack(int attackPower)
@@ -134,14 +166,23 @@ public class Player : Mob
             currentNodePosition.InteractableObject.Interact();
         }
 
+
+        SetState(State.DecidingWhereToMoveOrAct);
+
         // notify GameManager that players turn has ended
-        GameManager.Instance.playersTurn = false;
+        // GameManager.Instance.playersTurn = false;
     }
 
     private void HandleNodeClicked(NavNode clickedNavNode)
     {
-        if (!GameManager.Instance.playersTurn || !acceptingInput)
+        if (_state != State.DecidingWhereToMoveOrAct || !acceptingInput)
         {
+            return;
+        }
+
+        if (!_nodesWithinMovementRange.Contains(clickedNavNode))
+        {
+            Debug.Log("out of range");
             return;
         }
 
@@ -153,6 +194,7 @@ public class Player : Mob
                 StopCoroutine(pathingCoroutine);
             }
             pathingCoroutine = StartCoroutine(Pathing());
+            SetState(State.Moving);
         }
     }
 
@@ -175,13 +217,13 @@ public class Player : Mob
             }
         }
 
-        if (_nodesWithinMovementRange != null)
-        {
-            for (int i = 0; i < _nodesWithinMovementRange.Count; i++)
-            {
-                Gizmos.color = Color.yellow;
-                Gizmos.DrawCube(_nodesWithinMovementRange[i].WorldPosition, Vector3.one);
-            }
-        }
+        // if (_nodesWithinMovementRange != null)
+        // {
+        //     for (int i = 0; i < _nodesWithinMovementRange.Count; i++)
+        //     {
+        //         Gizmos.color = Color.yellow;
+        //         Gizmos.DrawCube(_nodesWithinMovementRange[i].WorldPosition, Vector3.one);
+        //     }
+        // }
     }
 }
