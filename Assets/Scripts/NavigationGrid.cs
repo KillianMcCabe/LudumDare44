@@ -8,7 +8,14 @@ public class NavigationGrid : MonoBehaviour
     const float LightRange = 8;
     private const float zPos = -1;
 
-    public Grid gridBase;
+    [SerializeField]
+    Grid _gridBase;
+
+    [SerializeField]
+    Tilemap _groundTilemap;
+
+    [SerializeField]
+    Tilemap _fogTilemap;
 
     [SerializeField]
     GameObject _nodePrefab;
@@ -56,19 +63,18 @@ public class NavigationGrid : MonoBehaviour
     /// Generate a grid of nodes, ready to be used by a-star algorigthm
     private void GenerateNodes()
     {
+
         // scan tiles and create nodes based on where they are
         List<NavNode> unsortedNodes = new List<NavNode>();
         for (int x = scanStartX; x < scanFinishX; x++)
         {
             for (int y = scanStartY; y < scanFinishY; y++)
             {
-                // GameObject node = new GameObject("Nav Node");
                 GameObject node = Instantiate(_nodePrefab);
-                node.transform.position = new Vector3(x + gridBase.transform.position.x, y + gridBase.transform.position.y, zPos);
+                node.transform.position = new Vector3(x + _gridBase.transform.position.x, y + _gridBase.transform.position.y, zPos);
                 NavNode navNode = node.GetComponent<NavNode>();
                 navNode.transform.SetParent(_nodeGridParent.transform);
-                navNode.worldPosX = x;
-                navNode.worldPosY = y;
+                navNode.Init(_groundTilemap, new Vector2Int(x, y));
                 if (Physics2D.OverlapCircle(new Vector3(x, y), 0.25f, _collisionLayerMask))
                 {
                     navNode.Walkable = false;
@@ -81,21 +87,21 @@ public class NavigationGrid : MonoBehaviour
                 unsortedNodes.Add(navNode);
 
                 // update gridBounds
-                if (navNode.worldPosX < gridMinWorldX)
+                if (navNode.WorldPosition.x < gridMinWorldX)
                 {
-                    gridMinWorldX = navNode.worldPosX;
+                    gridMinWorldX = navNode.WorldPosition.x;
                 }
-                if (navNode.worldPosX > gridMaxWorldX)
+                if (navNode.WorldPosition.x > gridMaxWorldX)
                 {
-                    gridMaxWorldX = navNode.worldPosX;
+                    gridMaxWorldX = navNode.WorldPosition.x;
                 }
-                if (navNode.worldPosY < gridMinWorldY)
+                if (navNode.WorldPosition.y < gridMinWorldY)
                 {
-                    gridMinWorldY = navNode.worldPosY;
+                    gridMinWorldY = navNode.WorldPosition.y;
                 }
-                if (navNode.worldPosY > gridMaxWorldY)
+                if (navNode.WorldPosition.y > gridMaxWorldY)
                 {
-                    gridMaxWorldY = navNode.worldPosY;
+                    gridMaxWorldY = navNode.WorldPosition.y;
                 }
             }
         }
@@ -107,8 +113,8 @@ public class NavigationGrid : MonoBehaviour
         nodeGrid = new NavNode[navGridSizeX + 1, navGridSizeY + 1];
         foreach (NavNode navNode in unsortedNodes)
         {
-            int x = navNode.worldPosX - gridMinWorldX;
-            int y = navNode.worldPosY - gridMinWorldY;
+            int x = navNode.WorldPosition.x - gridMinWorldX;
+            int y = navNode.WorldPosition.y - gridMinWorldY;
 
             navNode.gameObject.name = $"x:{x} , y:{y}";
             navNode.gridX = x;

@@ -113,7 +113,7 @@ public class Enemy : Mob
                 currentNodePosition.Mob = null;
                 currentNodePosition = nextNode;
                 currentNodePosition.Mob = this;
-                transform.position = currentNodePosition.WorldPosition;
+                // transform.position = currentNodePosition.WorldPosition;
             }
             yield return new WaitForSeconds(0.25f);
         }

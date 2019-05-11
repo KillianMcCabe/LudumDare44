@@ -144,8 +144,9 @@ public class Player : Mob
             }
             else
             {
+                Vector3 moveToPosition = new Vector3(nextNode.WorldPosition.x, nextNode.WorldPosition.y, transform.position.z);
                 // move to new position
-                while (transform.position != (Vector3)nextNode.WorldPosition)
+                while (transform.position != moveToPosition)
                 {
                     transform.position = Vector2.MoveTowards(transform.position, nextNode.WorldPosition, Time.deltaTime * moveSpeed);
                     yield return null;
@@ -154,7 +155,7 @@ public class Player : Mob
                 currentNodePosition.Mob = null;
                 currentNodePosition = nextNode;
                 currentNodePosition.Mob = this;
-                transform.position = currentNodePosition.WorldPosition;
+                // transform.position = currentNodePosition.WorldPosition;
             }
 
             NavigationGrid.Instance.CalculateLighting(); // TODO: move into GameManager.cs
@@ -207,12 +208,12 @@ public class Player : Mob
                 if (i == 0)
                 {
                     Gizmos.color = Color.green;
-                    Gizmos.DrawLine(currentNodePosition.WorldPosition, pathing[i].WorldPosition);
+                    Gizmos.DrawLine(currentNodePosition.WorldPosition3, pathing[i].WorldPosition3);
                 }
                 else
                 {
                     Gizmos.color = Color.yellow;
-                    Gizmos.DrawLine(pathing[i-1].WorldPosition, pathing[i].WorldPosition);
+                    Gizmos.DrawLine(pathing[i-1].WorldPosition3, pathing[i].WorldPosition3);
                 }
             }
         }

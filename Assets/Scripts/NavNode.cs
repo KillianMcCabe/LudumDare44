@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class NavNode : MonoBehaviour , IHeapItem<NavNode>
 {
@@ -10,12 +11,12 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
     public int gCost;
     public int hCost;
     public int gridX, gridY;
-    public int worldPosX, worldPosY;
     public List<NavNode> neighbours;
     public NavNode parent;
     public InteractableObject InteractableObject;
     public Mob Mob;
 
+    private Vector2Int _worldPosition;
     int heapIndex;
     bool _visible = true;
     bool _hasBeenSeen = false;
@@ -26,6 +27,9 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
     private Color _highlight = new Color(0, 0, 0, 0);
 
     SpriteRenderer _spriteRenderer;
+
+    TileBase _originalTile;
+    Tilemap _tilemap;
 
     public bool Walkable
     {
@@ -75,23 +79,26 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
             if (_visible)
             {
                 _hasBeenSeen = true;
+                _tilemap.SetTile(WorldPositionVec3Int, _originalTile);
             }
 
             UpdateSpriteRenderer();
         }
     }
 
-    public Vector2 WorldPosition
+    public Vector2Int WorldPosition
     {
-        get { return new Vector2(worldPosX, worldPosY); }
+        get { return _worldPosition; }
     }
 
-    /// <summary>
-    /// Awake is called when the script instance is being loaded.
-    /// </summary>
-    void Awake()
+    public Vector3 WorldPosition3
     {
-        _spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+        get { return new Vector3 (_worldPosition.x, _worldPosition.y, 0 ); }
+    }
+
+    public Vector3Int WorldPositionVec3Int
+    {
+        get { return Vector3Int.RoundToInt(WorldPosition3); }
     }
 
     public int fCost
@@ -109,6 +116,24 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
         {
             heapIndex = value;
         }
+    }
+
+    /// <summary>
+    /// Awake is called when the script instance is being loaded.
+    /// </summary>
+    void Awake()
+    {
+        _spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+    }
+
+    public void Init(Tilemap tilemap, Vector2Int worldPos)
+    {
+        _tilemap = tilemap;
+
+        _worldPosition = worldPos;
+
+        _originalTile = _tilemap.GetTile(WorldPositionVec3Int);
+        _tilemap.SetTile(WorldPositionVec3Int, null); // destory
     }
 
     public int CompareTo(NavNode nodeToCompare)
@@ -141,22 +166,27 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
         {
             if (_hasBeenSeen)
             {
-                _spriteRenderer.color = new Color(0, 0, 0, 0.5f); // darkened
+                // _spriteRenderer.color = new Color(0, 0, 0, 0.5f); // darkened
+                // visible
+                _tilemap.SetColor(WorldPositionVec3Int,  new Color( 0.5f, 0.5f,  0.5f, 0.5f));
             }
             else
             {
-                _spriteRenderer.color = new Color(0, 0, 0, 1); // blacked out
+                // _spriteRenderer.color = new Color(0, 0, 0, 1); // blacked out
             }
         }
         else
         {
+            // visible
+            _tilemap.SetColor(WorldPositionVec3Int,  new Color(1, 1, 1, 1));
             if (_highlight != Color.black)
             {
                 _spriteRenderer.color = _highlight * new Color(1, 1, 1, 0.25f); // visible
             }
             else
             {
-                _spriteRenderer.color = new Color(0, 0, 0, 0); // visible
+                
+                // _spriteRenderer.color = new Color(0, 0, 0, 0); 
             }
         }
     }
