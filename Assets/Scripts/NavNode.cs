@@ -134,6 +134,8 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
 
         _originalTile = _tilemap.GetTile(WorldPositionVec3Int);
         _tilemap.SetTile(WorldPositionVec3Int, null); // destory
+
+        Visible = true;
     }
 
     public int CompareTo(NavNode nodeToCompare)

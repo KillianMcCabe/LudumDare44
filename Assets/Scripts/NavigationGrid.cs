@@ -18,6 +18,9 @@ public class NavigationGrid : MonoBehaviour
     Tilemap _fogTilemap;
 
     [SerializeField]
+    TileBase _fogTile;
+
+    [SerializeField]
     GameObject _nodePrefab;
 
     //these are the bounds of where we are searching in the world for tiles, have to use world coords to check for tiles in the tile map
@@ -149,7 +152,13 @@ public class NavigationGrid : MonoBehaviour
             for (int y = 0; y < lightGridSizeY; y++)
             {
                 LightNode newLightNode = new LightNode();
-                newLightNode.WorldPosition = new Vector2(gridMinWorldX + x + 0.5f, gridMinWorldY + y + 0.5f);
+                newLightNode.Init(
+                    _fogTilemap,
+                    _fogTile,
+                    // new Vector2(gridMinWorldX + x + 0.5f, gridMinWorldY + y + 0.5f)
+                    new Vector2(gridMinWorldX + x , gridMinWorldY + y )
+
+                );
                 newLightNode.navNodes = new List<NavNode>();
                 for (int i = 0; i <= 1; i++)
                 {
@@ -188,10 +197,11 @@ public class NavigationGrid : MonoBehaviour
                 if (hit.collider == null)
                 {
                     // Debug.DrawLine(lightNode.WorldPosition, lightNode.WorldPosition + towardsPlayer, Color.green, 2f);
-                    foreach (NavNode n in lightNode.navNodes)
-                    {
-                        n.Visible = true;
-                    }
+                    lightNode.Visible = true;
+                    // foreach (NavNode n in lightNode.navNodes)
+                    // {
+                    //     n.Visible = true;
+                    // }
                 }
                 else
                 {
@@ -343,5 +353,19 @@ public class NavigationGrid : MonoBehaviour
         }
 
         return path;
+    }
+
+    void OnDrawGizmos()
+    {
+        if (lightNodeGrid != null)
+        {
+            foreach (LightNode lightNode in lightNodeGrid)
+            {
+                if (lightNode.Visible)
+                {
+                    Gizmos.DrawSphere(lightNode.WorldPosition, 0.5f);
+                }
+            }
+        }
     }
 }

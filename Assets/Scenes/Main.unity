@@ -4113,6 +4113,7 @@ MonoBehaviour:
   _gridBase: {fileID: 740490876}
   _groundTilemap: {fileID: 533438595}
   _fogTilemap: {fileID: 1876593672}
+  _fogTile: {fileID: 11400000, guid: 26f14cd7406d42640a4dddb224f95645, type: 2}
   _nodePrefab: {fileID: 7463786660901052157, guid: e01b6132aa797fb4290cc37e96693109,
     type: 3}
   scanStartX: -10
@@ -5280,7 +5281,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1876593669}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 0.5, z: 0}
+  m_LocalPosition: {x: -0.5, y: -0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 740490877}
@@ -6108,7 +6109,7 @@ Tilemap:
   - first: {x: 0, y: 2, z: 0}
     second:
       m_TileIndex: 0
-      m_TileSpriteIndex: 0
+      m_TileSpriteIndex: 12
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_ObjectToInstantiate: {fileID: 0}
@@ -6119,7 +6120,7 @@ Tilemap:
   - m_RefCount: 86
     m_Data: {fileID: 11400000, guid: 26f14cd7406d42640a4dddb224f95645, type: 2}
   m_TileSpriteArray:
-  - m_RefCount: 12
+  - m_RefCount: 11
     m_Data: {fileID: 21300140, guid: 79773997b158cb440a05aeecd66499c0, type: 3}
   - m_RefCount: 16
     m_Data: {fileID: 21300154, guid: 79773997b158cb440a05aeecd66499c0, type: 3}
@@ -6143,6 +6144,8 @@ Tilemap:
     m_Data: {fileID: 21300128, guid: 79773997b158cb440a05aeecd66499c0, type: 3}
   - m_RefCount: 1
     m_Data: {fileID: 21300138, guid: 79773997b158cb440a05aeecd66499c0, type: 3}
+  - m_RefCount: 1
+    m_Data: {fileID: 21300142, guid: 79773997b158cb440a05aeecd66499c0, type: 3}
   m_TileMatrixArray:
   - m_RefCount: 86
     m_Data:
