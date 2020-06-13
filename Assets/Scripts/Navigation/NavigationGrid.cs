@@ -174,6 +174,7 @@ public class NavigationGrid : MonoBehaviour
         }
     }
 
+    // TODO: move into new script e.g. LightingManager.cs
     public void CalculateLighting()
     {
         // start by setting all nodes to dark

@@ -28,10 +28,7 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
 
     SpriteRenderer _spriteRenderer;
 
-    // TileBase _originalTile;
     TileBase _fogTile;
-
-    // Tilemap _tilemap;
     Tilemap _fogTilemap;
 
     public bool Walkable
@@ -82,8 +79,6 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
             if (_visible)
             {
                 _hasBeenSeen = true;
-
-                // _tilemap.SetTile(WorldPositionVec3Int, _originalTile);
             }
 
             UpdateSpriteRenderer();
@@ -132,23 +127,18 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
 
     public void Init(Tilemap tilemap, Tilemap fogTilemap, TileBase fogTile, Vector2Int worldPos)
     {
-        // _tilemap = tilemap;
         _fogTilemap = fogTilemap;
         _fogTile = fogTile;
 
         _worldPosition = worldPos;
 
         if (fogTile == null)
-        {
-            Debug.Log("fogTile: " + fogTile);
-        }
+            Debug.LogError("fogTile is null!");
 
         // add fog at this position
         _fogTilemap.SetTile(WorldPositionVector3Int, _fogTile);
 
         _spriteRenderer.enabled = false;
-        // _originalTile = _tilemap.GetTile(WorldPositionVector3Int);
-        // _tilemap.SetTile(WorldPositionVec3Int, null); // destory
 
         Visible = false;
     }
@@ -189,21 +179,11 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
                 // semi-fog
                 _fogTilemap.SetColor(WorldPositionVector3Int, new Color( 0.25f, 0.25f, 0.25f, 0.25f));
             }
-            // else
-            // {
-            //     // total-fog
-            //     _fogTilemap.SetColor(WorldPositionVector3Int, new Color( 1f, 1f, 1f, 1f));
-            // }
         }
         else
         {
             // remove fog
             _fogTilemap.SetTile(WorldPositionVector3Int, null);
-
-            // if (_highlight != Color.black)
-            // {
-            //     _spriteRenderer.color = _highlight * new Color(1, 1, 1, 0.25f); // visible
-            // }
         }
     }
 
