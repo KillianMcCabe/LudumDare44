@@ -11,14 +11,10 @@ public class Enemy : Mob
         Aggravated
     }
 
-    [SerializeField]
-    SpriteRenderer _spriteRenderer = null;
-
-    private bool isMoving;
-
+    private bool _isMoving;
     public bool IsMoving
     {
-        get { return isMoving; }
+        get { return _isMoving; }
     }
 
     public int strength;
@@ -39,7 +35,7 @@ public class Enemy : Mob
         GameManager.Instance.AddEnemyToList(this);
 
         _state = State.Sleeping;
-        isMoving = false;
+        _isMoving = false;
     }
 
     public void Move()
@@ -52,7 +48,7 @@ public class Enemy : Mob
                 break;
             case State.Aggravated:
 
-                isMoving = true;
+                _isMoving = true;
 
                 pathing = NavigationGrid.Instance.CalculatePath(currentNodePosition, Player.Instance.NodePosition);
                 if (pathingCoroutine != null)
@@ -93,7 +89,7 @@ public class Enemy : Mob
             // check if the path is blocked by an object e.g. door
             if (nextNode.InteractableObject != null && nextNode.Blocked)
             {
-                isMoving = false;
+                _isMoving = false;
                 yield break;
             }
             // check if the path is blocked by a mob
@@ -105,7 +101,7 @@ public class Enemy : Mob
                     // attack the player
                     nextNode.Mob.ReceiveAttack(strength);
                 }
-                isMoving = false;
+                _isMoving = false;
                 yield break;
             }
             else
@@ -118,6 +114,6 @@ public class Enemy : Mob
             yield return new WaitForSeconds(0.25f);
         }
 
-        isMoving = false;
+        _isMoving = false;
     }
 }

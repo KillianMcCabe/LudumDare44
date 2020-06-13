@@ -19,13 +19,13 @@ public class DialogueController : MonoBehaviour
         }
     }
 
-    [SerializeField] Text _titleText;
+    [SerializeField] Text _titleText = null;
 
-    [SerializeField] Text _dialogueText;
+    [SerializeField] Text _dialogueText = null;
 
-    [SerializeField] Button _nextButton;
+    [SerializeField] Button _nextButton = null;
 
-    int dialogueIndex = 0;
+    int _dialogueIndex = 0;
 
     Dialogue[] greedDialogue =
     {
@@ -46,18 +46,18 @@ public class DialogueController : MonoBehaviour
 
     void HandleNextButtonClicked()
     {
-        LoadText(dialogueIndex + 1);
+        LoadText(_dialogueIndex + 1);
     }
 
     private void LoadText(int index)
     {
-        dialogueIndex = index;
+        _dialogueIndex = index;
 
-        if (dialogueIndex < greedDialogue.Length)
+        if (_dialogueIndex < greedDialogue.Length)
         {
-            _titleText.text = greedDialogue[dialogueIndex].Title;
-            _dialogueText.text = greedDialogue[dialogueIndex].Message;
-            _nextButton.GetComponentInChildren<Text>().text = greedDialogue[dialogueIndex].OptionText;
+            _titleText.text = greedDialogue[_dialogueIndex].Title;
+            _dialogueText.text = greedDialogue[_dialogueIndex].Message;
+            _nextButton.GetComponentInChildren<Text>().text = greedDialogue[_dialogueIndex].OptionText;
         }
         else
         {

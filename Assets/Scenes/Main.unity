@@ -707,19 +707,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08c29b77ba3a9e9419da052436160580, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spriteRenderer: {fileID: 206442884}
   strength: 4
   armor: 0
   health: 6
 --- !u!4 &206442883 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5087154775055291979, guid: c5dcf456bffcb694f84c432f7b1cf0c6,
-    type: 3}
-  m_PrefabInstance: {fileID: 5087154775126198216}
-  m_PrefabAsset: {fileID: 0}
---- !u!212 &206442884 stripped
-SpriteRenderer:
-  m_CorrespondingSourceObject: {fileID: 5087154775055291978, guid: c5dcf456bffcb694f84c432f7b1cf0c6,
     type: 3}
   m_PrefabInstance: {fileID: 5087154775126198216}
   m_PrefabAsset: {fileID: 0}
@@ -898,7 +891,6 @@ MonoBehaviour:
   levelStartDelay: 2
   turnDelay: 0.1
   playerFoodPoints: 100
-  playersTurn: 1
   _enemiesMovingPanel: {fileID: 592937544}
 --- !u!4 &326049205
 Transform:

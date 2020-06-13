@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 
-// TODO: change to interface
-public abstract class InteractableObject : MonoBehaviour
+public abstract class InteractableObject : MonoBehaviour, IInteractable
 {
     public abstract void Interact();
 

@@ -1,15 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 
 public class MessageLogController : MonoBehaviour
 {
     [SerializeField]
-    GameObject _messageList;
+    GameObject _messageList = null;
 
     [SerializeField]
-    GameObject _messageLogItemPrefab;
+    GameObject _messageLogItemPrefab = null;
 
     public enum MessageType
     {

@@ -9,19 +9,19 @@ public class NavigationGrid : MonoBehaviour
     private const float zPos = -1;
 
     [SerializeField]
-    Grid _gridBase;
+    Grid _gridBase = null;
 
     [SerializeField]
-    Tilemap _groundTilemap;
+    Tilemap _groundTilemap = null;
 
     [SerializeField]
-    Tilemap _fogTilemap;
+    Tilemap _fogTilemap = null;
 
     [SerializeField]
-    TileBase _fogTile;
+    TileBase _fogTile = null;
 
     [SerializeField]
-    GameObject _nodePrefab;
+    GameObject _nodePrefab = null;
 
     //these are the bounds of where we are searching in the world for tiles, have to use world coords to check for tiles in the tile map
     public int scanStartX = -250, scanStartY = -250, scanFinishX = 250, scanFinishY = 250;

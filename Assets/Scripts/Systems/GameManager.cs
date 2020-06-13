@@ -1,21 +1,19 @@
 ﻿using UnityEngine;
 using System.Collections;
-
-using System.Collections.Generic;       //Allows us to use Lists. 
+using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
-    public float levelStartDelay = 2f;                      //Time to wait before starting level, in seconds.
-    public float turnDelay = 0.1f;                          //Delay between each Player turn.
-    public int playerFoodPoints = 100;                      //Starting value for Player food points.
-    public static GameManager Instance = null;              //Static instance of GameManager which allows it to be accessed by any other script.
-    [HideInInspector] public bool playersTurn = true;       //Boolean to check if it's players turn, hidden in inspector but public.
+    public float levelStartDelay = 2f;                      // Time to wait before starting level, in seconds.
+    public float turnDelay = 0.1f;                          // Delay between each Player turn.
+    public int playerFoodPoints = 100;                      // Starting value for Player food points.
+    public static GameManager Instance = null;              // Static instance of GameManager which allows it to be accessed by any other script.
+    [System.NonSerialized] public bool playersTurn = true;       // Boolean to check if it's players turn, hidden in inspector but public.
 
-    [SerializeField]
-    GameObject _enemiesMovingPanel;
+    [SerializeField] GameObject _enemiesMovingPanel = null;
 
-    private List<Enemy> enemies;                            //List of all Enemy units, used to issue them move commands.
-    private bool enemiesMoving;                             //Boolean to check if enemies are moving.
+    private List<Enemy> enemies;                            // List of all Enemy units, used to issue them move commands.
+    private bool enemiesMoving;                             // Boolean to check if enemies are moving.
 
     //Awake is always called before any Start functions
     void Awake()
