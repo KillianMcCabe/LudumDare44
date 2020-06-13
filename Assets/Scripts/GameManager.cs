@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     GameObject _enemiesMovingPanel;
 
-    private List<Enemy> enemies;                          //List of all Enemy units, used to issue them move commands.
+    private List<Enemy> enemies;                            //List of all Enemy units, used to issue them move commands.
     private bool enemiesMoving;                             //Boolean to check if enemies are moving.
 
     //Awake is always called before any Start functions

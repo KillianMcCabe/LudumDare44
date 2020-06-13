@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class Door : InteractableObject
 {
-    NavNode currentNodePosition;
+    // the nav-node which this object occupies
+    NavNode _occupiedNavNode = null;
 
     public enum State
     {
@@ -31,9 +32,9 @@ public class Door : InteractableObject
     // Start is called before the first frame update
     void Start()
     {
-        currentNodePosition = NavigationGrid.Instance.GetNode(new Vector2(transform.position.x, transform.position.y));
-        currentNodePosition.InteractableObject = this;
-        currentNodePosition.BlocksLight = true;
+        _occupiedNavNode = NavigationGrid.Instance.GetNode(new Vector2(transform.position.x, transform.position.y));
+        _occupiedNavNode.InteractableObject = this;
+        _occupiedNavNode.BlocksLight = true;
 
         HandleStateChange();
     }
@@ -50,7 +51,7 @@ public class Door : InteractableObject
         {
             if (Player.Instance.HasKey)
             {
-                currentNodePosition.InteractableObject = null;
+                _occupiedNavNode.InteractableObject = null;
                 MessageLogController.Instance.AddMessage("You unlocked the door using a key.");
                 SetState(State.Closed);
             }
@@ -76,8 +77,8 @@ public class Door : InteractableObject
             _spriteRenderer.sprite = _openSprite;
         }
 
-        currentNodePosition.Blocked = (_state == State.Locked);
-        currentNodePosition.BlocksLight = (_state != State.Open);
+        _occupiedNavNode.Blocked = (_state == State.Locked);
+        _occupiedNavNode.BlocksLight = (_state != State.Open);
     }
 
     /// <summary>

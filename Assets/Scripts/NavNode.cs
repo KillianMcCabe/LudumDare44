@@ -28,8 +28,11 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
 
     SpriteRenderer _spriteRenderer;
 
-    TileBase _originalTile;
-    Tilemap _tilemap;
+    // TileBase _originalTile;
+    TileBase _fogTile;
+
+    // Tilemap _tilemap;
+    Tilemap _fogTilemap;
 
     public bool Walkable
     {
@@ -79,7 +82,8 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
             if (_visible)
             {
                 _hasBeenSeen = true;
-                _tilemap.SetTile(WorldPositionVec3Int, _originalTile);
+
+                // _tilemap.SetTile(WorldPositionVec3Int, _originalTile);
             }
 
             UpdateSpriteRenderer();
@@ -91,14 +95,14 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
         get { return _worldPosition; }
     }
 
-    public Vector3 WorldPosition3
+    public Vector3 WorldPositionVector3
     {
         get { return new Vector3 (_worldPosition.x, _worldPosition.y, 0 ); }
     }
 
-    public Vector3Int WorldPositionVec3Int
+    public Vector3Int WorldPositionVector3Int
     {
-        get { return Vector3Int.RoundToInt(WorldPosition3); }
+        get { return Vector3Int.RoundToInt(WorldPositionVector3); }
     }
 
     public int fCost
@@ -126,16 +130,27 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
         _spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
     }
 
-    public void Init(Tilemap tilemap, Vector2Int worldPos)
+    public void Init(Tilemap tilemap, Tilemap fogTilemap, TileBase fogTile, Vector2Int worldPos)
     {
-        _tilemap = tilemap;
+        // _tilemap = tilemap;
+        _fogTilemap = fogTilemap;
+        _fogTile = fogTile;
 
         _worldPosition = worldPos;
 
-        _originalTile = _tilemap.GetTile(WorldPositionVec3Int);
-        _tilemap.SetTile(WorldPositionVec3Int, null); // destory
+        if (fogTile == null)
+        {
+            Debug.Log("fogTile: " + fogTile);
+        }
 
-        Visible = true;
+        // add fog at this position
+        _fogTilemap.SetTile(WorldPositionVector3Int, _fogTile);
+
+        _spriteRenderer.enabled = false;
+        // _originalTile = _tilemap.GetTile(WorldPositionVector3Int);
+        // _tilemap.SetTile(WorldPositionVec3Int, null); // destory
+
+        Visible = false;
     }
 
     public int CompareTo(NavNode nodeToCompare)
@@ -166,30 +181,29 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
         // set tile shadow color
         if (!_visible)
         {
+            // add fog
+            _fogTilemap.SetTile(WorldPositionVector3Int, _fogTile);
+
             if (_hasBeenSeen)
             {
-                // _spriteRenderer.color = new Color(0, 0, 0, 0.5f); // darkened
-                // visible
-                _tilemap.SetColor(WorldPositionVec3Int,  new Color( 0.5f, 0.5f,  0.5f, 0.5f));
+                // semi-fog
+                _fogTilemap.SetColor(WorldPositionVector3Int, new Color( 0.25f, 0.25f, 0.25f, 0.25f));
             }
-            else
-            {
-                // _spriteRenderer.color = new Color(0, 0, 0, 1); // blacked out
-            }
+            // else
+            // {
+            //     // total-fog
+            //     _fogTilemap.SetColor(WorldPositionVector3Int, new Color( 1f, 1f, 1f, 1f));
+            // }
         }
         else
         {
-            // visible
-            _tilemap.SetColor(WorldPositionVec3Int,  new Color(1, 1, 1, 1));
-            if (_highlight != Color.black)
-            {
-                _spriteRenderer.color = _highlight * new Color(1, 1, 1, 0.25f); // visible
-            }
-            else
-            {
-                
-                // _spriteRenderer.color = new Color(0, 0, 0, 0); 
-            }
+            // remove fog
+            _fogTilemap.SetTile(WorldPositionVector3Int, null);
+
+            // if (_highlight != Color.black)
+            // {
+            //     _spriteRenderer.color = _highlight * new Color(1, 1, 1, 0.25f); // visible
+            // }
         }
     }
 
@@ -203,7 +217,13 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
 
     void OnDrawGizmos()
     {
-        Gizmos.color = _walkable ? Color.white : Color.red;
+        if (!_walkable)
+            Gizmos.color = Color.red;
+        else if (_blocked)
+            Gizmos.color = new Color(1f, 0.5f, 0f); // orange
+        else
+            Gizmos.color = Color.white;
+
         Gizmos.DrawWireCube(transform.position, new Vector3(0.9f, 0.9f, 0.9f));
     }
 }

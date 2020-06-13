@@ -13,8 +13,8 @@ public class LightNode
     }
 
     bool _visible;
-    Tilemap _fogTilemap;
-    TileBase _fogTile;
+    // Tilemap _fogTilemap;
+    // TileBase _fogTile;
     Vector2 _worldPosition;
 
     public bool Visible
@@ -26,23 +26,23 @@ public class LightNode
             {
                 // Debug.Log("removing fog at " + WorldPositionVector3);
                 // remove fog tile
-                _fogTilemap.SetTile(WorldPositionVector3, null);
+                // _fogTilemap.SetTile(WorldPositionVector3Int, null);
             }
         }
     }
 
-    public Vector3Int WorldPositionVector3
+    public Vector3Int WorldPositionVector3Int
     {
         get { return new Vector3Int((int)_worldPosition.x, (int)_worldPosition.y, 0); }
     }
 
     public void Init(Tilemap fogTilemap, TileBase fogTile, Vector2 worldPos)
     {
-        _fogTilemap = fogTilemap;
-        _fogTile = fogTile;
+        // _fogTilemap = fogTilemap;
+        // _fogTile = fogTile;
         _worldPosition = worldPos;
 
-        _fogTilemap.SetTile(WorldPositionVector3, _fogTile);
+        // _fogTilemap.SetTile(WorldPositionVector3Int, _fogTile);
 
         Visible = false;
     }

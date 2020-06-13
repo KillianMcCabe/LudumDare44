@@ -77,14 +77,16 @@ public class NavigationGrid : MonoBehaviour
                 node.transform.position = new Vector3(x + _gridBase.transform.position.x, y + _gridBase.transform.position.y, zPos);
                 NavNode navNode = node.GetComponent<NavNode>();
                 navNode.transform.SetParent(_nodeGridParent.transform);
-                navNode.Init(_groundTilemap, new Vector2Int(x, y));
+                navNode.Init(_groundTilemap, _fogTilemap, _fogTile, new Vector2Int(x, y));
                 if (Physics2D.OverlapCircle(new Vector3(x, y), 0.25f, _collisionLayerMask))
                 {
                     navNode.Walkable = false;
+                    navNode.BlocksLight = true;
                 }
                 else
                 {
                     navNode.Walkable = true;
+                    navNode.BlocksLight = false;
                 }
 
                 unsortedNodes.Add(navNode);
@@ -155,9 +157,8 @@ public class NavigationGrid : MonoBehaviour
                 newLightNode.Init(
                     _fogTilemap,
                     _fogTile,
-                    // new Vector2(gridMinWorldX + x + 0.5f, gridMinWorldY + y + 0.5f)
-                    new Vector2(gridMinWorldX + x , gridMinWorldY + y )
-
+                    new Vector2(gridMinWorldX + x + 0.5f, gridMinWorldY + y + 0.5f)
+                    // new Vector2(gridMinWorldX + x , gridMinWorldY + y )
                 );
                 newLightNode.navNodes = new List<NavNode>();
                 for (int i = 0; i <= 1; i++)
@@ -198,10 +199,14 @@ public class NavigationGrid : MonoBehaviour
                 {
                     // Debug.DrawLine(lightNode.WorldPosition, lightNode.WorldPosition + towardsPlayer, Color.green, 2f);
                     lightNode.Visible = true;
-                    // foreach (NavNode n in lightNode.navNodes)
-                    // {
-                    //     n.Visible = true;
-                    // }
+
+                    // mark all nodes connected to this light node as visible
+                    foreach (NavNode n in lightNode.navNodes)
+                    {
+                        n.Visible = true;
+                        // if (!n.BlocksLight)
+                        //     n.Visible = true;
+                    }
                 }
                 else
                 {
@@ -310,8 +315,8 @@ public class NavigationGrid : MonoBehaviour
 
         foreach (NavNode neighbour in currentNode.neighbours)
         {
-            // if (depth + 1 < range && neighbour.Walkable && !neighbour.Blocked && neighbour.HasBeenSeen)
-            if (depth + 1 < range && neighbour.Walkable && neighbour.HasBeenSeen)
+            // if (depth + 1 < range && neighbour.Walkable && neighbour.HasBeenSeen)
+            if (depth + 1 < range && neighbour.Walkable && !neighbour.Blocked && neighbour.HasBeenSeen)
             {
                 if (!progress.Contains(neighbour) || neighbour.gCost > depth+1)
                 {

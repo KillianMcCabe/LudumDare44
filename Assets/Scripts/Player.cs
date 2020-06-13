@@ -17,6 +17,7 @@ public class Player : Mob
     const float moveSpeed = 6f;
 
     NavNode currentNodePosition;
+    NavNode _clickedNavNode;
     List<NavNode> pathing;
     List<NavNode> _nodesWithinMovementRange;
     Coroutine pathingCoroutine;
@@ -31,7 +32,7 @@ public class Player : Mob
     int health = 10;
 
     private State _state;
-    private int movement = 0;
+    private int movementRemaining = 0;
 
     public NavNode NodePosition
     {
@@ -80,14 +81,12 @@ public class Player : Mob
         switch (_state)
         {
             case State.DecidingWhereToMoveOrAct:
-                movement = speed;
-                _nodesWithinMovementRange = NavigationGrid.Instance.GetNodesWithinRange(currentNodePosition, movement);
-                // show highlight
+                movementRemaining = speed;
+                _nodesWithinMovementRange = NavigationGrid.Instance.GetNodesWithinRange(currentNodePosition, movementRemaining);
+                // show highlight on selectable nodes within movement range
                 for (int i = 0; i < _nodesWithinMovementRange.Count; i++)
                 {
                     _nodesWithinMovementRange[i].Highlight = Color.yellow;
-                    // Gizmos.color = Color.yellow;
-                    // Gizmos.DrawCube(_nodesWithinMovementRange[i].WorldPosition, Vector3.one);
                 }
                 break;
         }
@@ -122,9 +121,10 @@ public class Player : Mob
             NavNode nextNode = pathing[0];
             pathing.RemoveAt(0);
 
-            // check if the path is blocked by an object e.g. door
+            // check if the path is blocked by an object (e.g. a door)
             if (nextNode.InteractableObject != null && nextNode.Blocked)
             {
+                Debug.Log("path is blocked");
                 nextNode.InteractableObject.Interact();
 
                 // notify GameManager that players turn has ended
@@ -155,7 +155,6 @@ public class Player : Mob
                 currentNodePosition.Mob = null;
                 currentNodePosition = nextNode;
                 currentNodePosition.Mob = this;
-                // transform.position = currentNodePosition.WorldPosition;
             }
 
             NavigationGrid.Instance.CalculateLighting(); // TODO: move into GameManager.cs
@@ -166,36 +165,68 @@ public class Player : Mob
         {
             currentNodePosition.InteractableObject.Interact();
         }
-
+        // check if we clicked on an item which is now in interaction range
+        else if (_clickedNavNode.InteractableObject != null && currentNodePosition.neighbours.Contains(_clickedNavNode))
+        {
+            _clickedNavNode.InteractableObject.Interact();
+        }
 
         SetState(State.DecidingWhereToMoveOrAct);
-
-        // notify GameManager that players turn has ended
-        // GameManager.Instance.playersTurn = false;
     }
 
     private void HandleNodeClicked(NavNode clickedNavNode)
     {
+        // ignore any node clicks if we're not currently expecting map input
         if (_state != State.DecidingWhereToMoveOrAct || !acceptingInput)
+            return;
+
+        _clickedNavNode = clickedNavNode;
+
+        if (_nodesWithinMovementRange == null || _nodesWithinMovementRange.Count <= 0)
         {
+            Debug.LogError("_nodesWithinMovementRange is null / empty");
             return;
         }
 
-        if (!_nodesWithinMovementRange.Contains(clickedNavNode))
+        NavNode moveToThisNode = null;
+        if (_nodesWithinMovementRange.Contains(clickedNavNode))
         {
-            Debug.Log("out of range");
+            // move to node if it can be moved to
+            moveToThisNode = clickedNavNode;
+        }
+        else
+        {
+            // find node closest node which can be move to
+            float distanceToNearestNode = float.MaxValue;
+            foreach (NavNode n in _nodesWithinMovementRange)
+            {
+                float dist = Vector2.Distance(n.WorldPosition, clickedNavNode.WorldPosition);
+                if (dist < distanceToNearestNode)
+                {
+                    moveToThisNode = n;
+                    distanceToNearestNode = dist;
+                }
+            }
+        }
+
+        if (moveToThisNode == null)
+        {
+            Debug.LogError("moveToThisNode is null!");
             return;
         }
 
-        pathing = NavigationGrid.Instance.CalculatePath(currentNodePosition, clickedNavNode);
+        // Debug.Log("Moving to " + moveToThisNode.name);
+
+        pathing = NavigationGrid.Instance.CalculatePath(currentNodePosition, moveToThisNode);
         if (pathing != null)
         {
             if (pathingCoroutine != null)
             {
                 StopCoroutine(pathingCoroutine);
             }
-            pathingCoroutine = StartCoroutine(Pathing());
+
             SetState(State.Moving);
+            pathingCoroutine = StartCoroutine(Pathing());
         }
     }
 
@@ -208,12 +239,12 @@ public class Player : Mob
                 if (i == 0)
                 {
                     Gizmos.color = Color.green;
-                    Gizmos.DrawLine(currentNodePosition.WorldPosition3, pathing[i].WorldPosition3);
+                    Gizmos.DrawLine(currentNodePosition.WorldPositionVector3, pathing[i].WorldPositionVector3);
                 }
                 else
                 {
                     Gizmos.color = Color.yellow;
-                    Gizmos.DrawLine(pathing[i-1].WorldPosition3, pathing[i].WorldPosition3);
+                    Gizmos.DrawLine(pathing[i-1].WorldPositionVector3, pathing[i].WorldPositionVector3);
                 }
             }
         }
