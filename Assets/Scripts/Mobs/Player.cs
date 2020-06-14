@@ -157,7 +157,7 @@ public class Player : Mob
                 currentNodePosition.Mob = this;
             }
 
-            NavigationGrid.Instance.CalculateLighting(); // TODO: move into GameManager.cs
+            NavigationGrid.Instance.Lighting.Recalculate(); // TODO: move into GameManager.cs
         }
 
         // check if we stopped on an item

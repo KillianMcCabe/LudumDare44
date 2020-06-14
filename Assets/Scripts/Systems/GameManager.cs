@@ -46,7 +46,7 @@ public class GameManager : MonoBehaviour
     IEnumerator Start()
     {
         yield return null;
-        NavigationGrid.Instance.CalculateLighting();
+        NavigationGrid.Instance.Lighting.Recalculate();
         Player.Instance.StartTurn();
     }
 
