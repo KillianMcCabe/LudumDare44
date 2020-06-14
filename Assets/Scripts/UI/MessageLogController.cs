@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class MessageLogController : MonoBehaviour
+public class MessageLogController : SingletonMonoBehaviour<MessageLogController>
 {
     [SerializeField]
     GameObject _messageList = null;
@@ -15,23 +15,10 @@ public class MessageLogController : MonoBehaviour
         Success
     }
 
-    public static MessageLogController Instance;
-
-    void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else if (Instance != this)
-        {
-            Destroy(gameObject);
-        }
-    }
-
     public void AddMessage(string message, MessageType messageType = MessageType.Info)
     {
         Debug.Log(message);
+
         GameObject newMessage = GameObject.Instantiate(_messageLogItemPrefab);
         newMessage.transform.SetParent(_messageList.transform);
         newMessage.transform.SetAsLastSibling();

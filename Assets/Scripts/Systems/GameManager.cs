@@ -2,12 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class GameManager : MonoBehaviour
+public class GameManager : SingletonMonoBehaviour<GameManager>
 {
     public float levelStartDelay = 2f;                      // Time to wait before starting level, in seconds.
     public float turnDelay = 0.1f;                          // Delay between each Player turn.
     public int playerFoodPoints = 100;                      // Starting value for Player food points.
-    public static GameManager Instance = null;              // Static instance of GameManager which allows it to be accessed by any other script.
+
     [System.NonSerialized] public bool playersTurn = true;       // Boolean to check if it's players turn, hidden in inspector but public.
 
     [SerializeField] GameObject _enemiesMovingPanel = null;
@@ -18,15 +18,6 @@ public class GameManager : MonoBehaviour
     //Awake is always called before any Start functions
     void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else if (Instance != this)
-        {
-            Destroy(gameObject);
-        }
-
         //Assign enemies to a new List of Enemy objects.
         enemies = new List<Enemy>();
 
@@ -39,8 +30,6 @@ public class GameManager : MonoBehaviour
     {
         //Clear any Enemy objects in our List to prepare for next level.
         enemies.Clear();
-
-        // _navigationGrid.GenerateNodes(level);
     }
 
     IEnumerator Start()
@@ -74,9 +63,6 @@ public class GameManager : MonoBehaviour
     //GameOver is called when the player reaches 0 food points
     public void GameOver()
     {
-        //Enable black background image gameObject.
-        // levelImage.SetActive(true);
-
         //Disable this GameManager.
         enabled = false;
     }
