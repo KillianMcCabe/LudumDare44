@@ -50,12 +50,12 @@ public class Enemy : Mob
 
                 _isMoving = true;
 
-                pathing = NavigationGrid.Instance.CalculatePath(currentNodePosition, Player.Instance.NodePosition);
+                pathing = Pathing.CalculatePath(currentNodePosition, Player.Instance.NodePosition);
                 if (pathingCoroutine != null)
                 {
                     StopCoroutine(pathingCoroutine);
                 }
-                pathingCoroutine = StartCoroutine(Pathing());
+                pathingCoroutine = StartCoroutine(PathingCoroutine());
                 
                 break;
         }
@@ -78,7 +78,7 @@ public class Enemy : Mob
     }
 
     // Update is called once per frame
-    private IEnumerator Pathing()
+    private IEnumerator PathingCoroutine()
     {
         while (pathing.Count > 0)
         {

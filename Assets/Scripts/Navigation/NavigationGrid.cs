@@ -143,7 +143,7 @@ public class NavigationGrid : SingletonMonoBehaviour<NavigationGrid>
         return _nodeGrid[x, y];
     }
 
-    public List<NavNode> GetNeighbours(NavNode node)
+    private List<NavNode> GetNeighbours(NavNode node)
     {
         List<NavNode> neightbours = new List<NavNode>();
 
@@ -165,117 +165,6 @@ public class NavigationGrid : SingletonMonoBehaviour<NavigationGrid>
         }
 
         return neightbours;
-    }
-
-    public List<NavNode> CalculatePath(NavNode startNode, NavNode targetNode)
-    {
-        List<NavNode> path = new List<NavNode>();
-
-        if (startNode.Walkable && targetNode.Walkable)
-        {
-            Heap<NavNode> openSet = new Heap<NavNode>(_nodeGrid.Length);
-            HashSet<NavNode> closedSet = new HashSet<NavNode>();
-            openSet.Add(startNode);
-            
-            while (openSet.Count > 0)
-            {
-                NavNode currentNode = openSet.RemoveFirst();
-                closedSet.Add(currentNode);
-
-                if (currentNode == targetNode)
-                {
-                    break;
-                }
-
-                foreach (NavNode neighbour in currentNode.neighbours)
-                {
-                    if (!neighbour.Walkable || closedSet.Contains(neighbour))
-                    {
-                        continue;
-                    }
-
-                    int newMovementCostToNeighbour = currentNode.gCost + GetDistance(currentNode, neighbour);
-                    if (newMovementCostToNeighbour < neighbour.gCost || !openSet.Contains(neighbour))
-                    {
-                        neighbour.gCost = newMovementCostToNeighbour;
-                        neighbour.hCost = GetDistance(neighbour, targetNode);
-                        neighbour.parent = currentNode;
-
-                        if (!openSet.Contains(neighbour))
-                            openSet.Add(neighbour);
-                        else
-                            openSet.UpdateItem(neighbour);
-                    }
-                }
-            }
-        }
-
-        path = RetracePath(startNode, targetNode);
-        if (path != null)
-            path.Reverse();
-
-        return path;
-    }
-
-    public List<NavNode> GetNodesWithinRange(NavNode startNode, int range)
-    {
-        List<NavNode> result = new List<NavNode>();
-
-        // Breadth first search
-        GetNodesWithinRangeBFS(startNode, range, result, 0);
-
-        return result;
-    }
-
-    public void GetNodesWithinRangeBFS(NavNode currentNode, int range, List<NavNode> progress, int depth)
-    {
-        progress.Add(currentNode);
-
-        foreach (NavNode neighbour in currentNode.neighbours)
-        {
-            // if (depth + 1 < range && neighbour.Walkable && neighbour.HasBeenSeen)
-            if (depth + 1 < range && neighbour.Walkable && !neighbour.Blocked && neighbour.HasBeenSeen)
-            {
-                if (!progress.Contains(neighbour) || neighbour.gCost > depth+1)
-                {
-                    neighbour.gCost = depth+1;
-                    GetNodesWithinRangeBFS(neighbour, range, progress, depth + 1);
-                }
-            }
-        }
-    }
-
-    private int GetDistance(NavNode nodeA, NavNode nodeB)
-    {
-        int dstX = Mathf.Abs(nodeA.gridX - nodeB.gridX);
-        int dstY = Mathf.Abs(nodeA.gridY - nodeB.gridY);
-
-        if (dstX > dstY)
-        {
-            return 14 * dstY + 10 * (dstX - dstY);
-        }
-        else
-        {
-            return 14 * dstX + 10 * (dstY - dstX);
-        }
-    }
-
-    private List<NavNode> RetracePath(NavNode startNode, NavNode endNode)
-    {
-        List<NavNode> path = new List<NavNode>();
-        NavNode currentNode = endNode;
-
-        while (currentNode != startNode)
-        {
-            if (currentNode.parent == null)
-            {
-                return null;
-            }
-            path.Add(currentNode);
-            currentNode = currentNode.parent;
-        }
-
-        return path;
     }
 
     void OnDrawGizmos()

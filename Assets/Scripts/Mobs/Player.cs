@@ -20,6 +20,7 @@ public class Player : Mob
     NavNode _clickedNavNode;
     List<NavNode> pathing;
     List<NavNode> _nodesWithinMovementRange;
+    List<NavNode> _nodesWithinView;
     Coroutine pathingCoroutine;
 
     public bool HasKey = false;
@@ -33,6 +34,7 @@ public class Player : Mob
 
     private State _state;
     private int movementRemaining = 0;
+    private bool inCombat = false;
 
     public NavNode NodePosition
     {
@@ -42,7 +44,6 @@ public class Player : Mob
     public Vector2 WorldPosition
     {
         get { return transform.position; }
-        // get { return currentNodePosition.WorldPosition; }
     }
 
     /// <summary>
@@ -82,12 +83,14 @@ public class Player : Mob
         {
             case State.DecidingWhereToMoveOrAct:
                 movementRemaining = speed;
-                _nodesWithinMovementRange = NavigationGrid.Instance.GetNodesWithinRange(currentNodePosition, movementRemaining);
+                _nodesWithinMovementRange = Pathing.GetNodesWithinRange(currentNodePosition, movementRemaining);
                 // show highlight on selectable nodes within movement range
                 for (int i = 0; i < _nodesWithinMovementRange.Count; i++)
                 {
                     _nodesWithinMovementRange[i].Highlight = Color.yellow;
                 }
+
+                _nodesWithinView = Pathing.GetNodesWithinRange(currentNodePosition, movementRemaining);
                 break;
         }
     }
@@ -113,7 +116,7 @@ public class Player : Mob
     }
 
     // Update is called once per frame
-    private IEnumerator Pathing()
+    private IEnumerator PathingCoroutine()
     {
         while (pathing.Count > 0)
         {
@@ -189,24 +192,33 @@ public class Player : Mob
         }
 
         NavNode moveToThisNode = null;
-        if (_nodesWithinMovementRange.Contains(clickedNavNode))
+
+        // when in combat, only consider nodes within movement range
+        if (inCombat)
         {
-            // move to node if it can be moved to
-            moveToThisNode = clickedNavNode;
+            if (_nodesWithinMovementRange.Contains(clickedNavNode))
+            {
+                // move to node if it can be moved to
+                moveToThisNode = clickedNavNode;
+            }
+            else
+            {
+                // find node closest node which can be move to
+                float distanceToNearestNode = float.MaxValue;
+                foreach (NavNode n in _nodesWithinMovementRange)
+                {
+                    float dist = Vector2.Distance(n.WorldPosition, clickedNavNode.WorldPosition);
+                    if (dist < distanceToNearestNode)
+                    {
+                        moveToThisNode = n;
+                        distanceToNearestNode = dist;
+                    }
+                }
+            }
         }
         else
         {
-            // find node closest node which can be move to
-            float distanceToNearestNode = float.MaxValue;
-            foreach (NavNode n in _nodesWithinMovementRange)
-            {
-                float dist = Vector2.Distance(n.WorldPosition, clickedNavNode.WorldPosition);
-                if (dist < distanceToNearestNode)
-                {
-                    moveToThisNode = n;
-                    distanceToNearestNode = dist;
-                }
-            }
+            moveToThisNode = clickedNavNode;
         }
 
         if (moveToThisNode == null)
@@ -217,7 +229,7 @@ public class Player : Mob
 
         // Debug.Log("Moving to " + moveToThisNode.name);
 
-        pathing = NavigationGrid.Instance.CalculatePath(currentNodePosition, moveToThisNode);
+        pathing = Pathing.CalculatePath(currentNodePosition, moveToThisNode);
         if (pathing != null)
         {
             if (pathingCoroutine != null)
@@ -226,7 +238,7 @@ public class Player : Mob
             }
 
             SetState(State.Moving);
-            pathingCoroutine = StartCoroutine(Pathing());
+            pathingCoroutine = StartCoroutine(PathingCoroutine());
         }
     }
 
@@ -248,14 +260,5 @@ public class Player : Mob
                 }
             }
         }
-
-        // if (_nodesWithinMovementRange != null)
-        // {
-        //     for (int i = 0; i < _nodesWithinMovementRange.Count; i++)
-        //     {
-        //         Gizmos.color = Color.yellow;
-        //         Gizmos.DrawCube(_nodesWithinMovementRange[i].WorldPosition, Vector3.one);
-        //     }
-        // }
     }
 }
