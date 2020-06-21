@@ -26,8 +26,7 @@ public class Enemy : Mob
     private List<NavNode> pathing;
     Coroutine pathingCoroutine;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         currentNodePosition = NavigationGrid.Instance.GetNode(new Vector2(transform.position.x, transform.position.y));
         currentNodePosition.Mob = this;
@@ -50,7 +49,7 @@ public class Enemy : Mob
 
                 _isMoving = true;
 
-                pathing = Pathing.CalculatePath(currentNodePosition, GameSetupController.LocalPlayer.NodePosition);
+                pathing = Pathing.CalculatePath(currentNodePosition, GameManager.LocalPlayer.NodePosition);
                 if (pathingCoroutine != null)
                 {
                     StopCoroutine(pathingCoroutine);

@@ -60,7 +60,7 @@ public class Lighting
         // check all light nodes
         foreach (LightNode lightNode in _lightNodeGrid)
         {
-            Vector2 towardsPlayer = GameSetupController.LocalPlayer.WorldPosition - lightNode.WorldPosition;
+            Vector2 towardsPlayer = GameManager.LocalPlayer.WorldPosition - lightNode.WorldPosition;
             float dist = towardsPlayer.magnitude;
             // check if within light range
             if (dist < LightRange)

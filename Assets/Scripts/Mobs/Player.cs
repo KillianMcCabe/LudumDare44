@@ -62,6 +62,7 @@ public class Player : Mob
 
         if (_photonView.IsMine)
         {
+            GameManager.LocalPlayer = this;
             acceptingInput = true;
 
             NavNode.OnNodeClicked += HandleNodeClicked;

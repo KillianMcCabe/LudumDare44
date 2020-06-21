@@ -41,7 +41,7 @@ public class DialogueController : MonoBehaviour
     {
         _nextButton.onClick.AddListener(HandleNextButtonClicked);
         LoadText(0);
-        GameSetupController.LocalPlayer.acceptingInput = false;
+        GameManager.LocalPlayer.acceptingInput = false;
     }
 
     void HandleNextButtonClicked()
@@ -62,7 +62,7 @@ public class DialogueController : MonoBehaviour
         else
         {
             gameObject.SetActive(false);
-            GameSetupController.LocalPlayer.acceptingInput = true;
+            GameManager.LocalPlayer.acceptingInput = true;
         }
     }
 }

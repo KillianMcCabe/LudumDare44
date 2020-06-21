@@ -1,46 +1,48 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using Photon.Pun;
 
 public class GameManager : SingletonMonoBehaviour<GameManager>
 {
+    public static Player LocalPlayer = null;
+
     public float levelStartDelay = 2f;                      // Time to wait before starting level, in seconds.
     public float turnDelay = 0.1f;                          // Delay between each Player turn.
     public int playerFoodPoints = 100;                      // Starting value for Player food points.
 
-    [System.NonSerialized] public bool playersTurn = true;       // Boolean to check if it's players turn, hidden in inspector but public.
+    [System.NonSerialized]
+    public bool playersTurn = true;                         // Boolean to check if it's players turn, hidden in inspector but public.
 
-    [SerializeField] GameObject _enemiesMovingPanel = null;
+    [SerializeField]
+    private NavigationGrid _navigationGrid = null;
 
-    private List<Enemy> enemies;                            // List of all Enemy units, used to issue them move commands.
+    [SerializeField]
+    private GameObject _enemiesMovingPanel = null;
+
+    [SerializeField]
+    private Transform[] _playerSpawnPositions = null;
+
+    private List<Enemy> enemies = new List<Enemy>();        // List of all Enemy units, used to issue them move commands.
     private bool enemiesMoving;                             // Boolean to check if enemies are moving.
 
-    //Awake is always called before any Start functions
-    void Awake()
+    private void Awake()
     {
-        //Assign enemies to a new List of Enemy objects.
-        enemies = new List<Enemy>();
-
-        //Call the InitGame function to initialize the first level 
         InitGame();
     }
 
-    //Initializes the game for each level.
-    void InitGame()
+    private IEnumerator Start()
     {
-        //Clear any Enemy objects in our List to prepare for next level.
-        enemies.Clear();
-    }
+        // Wait for local player to be assigned
+        while (LocalPlayer == null)
+            yield return null;
 
-    IEnumerator Start()
-    {
-        yield return null;
         NavigationGrid.Instance.Lighting.Recalculate();
-        GameSetupController.LocalPlayer.StartTurn();
+        LocalPlayer.StartTurn();
     }
 
-    //Update is called every frame.
-    void Update()
+    private void Update()
     {
         //Check that playersTurn or enemiesMoving or doingSetup are not currently true.
         if (playersTurn || enemiesMoving)
@@ -49,7 +51,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         StartCoroutine(MoveEnemies());
     }
 
-    //Call this to add the passed in Enemy to the List of Enemy objects.
+    // Call this to add the passed in Enemy to the List of Enemy objects.
     public void AddEnemyToList(Enemy enemy)
     {
         enemies.Add(enemy);
@@ -60,23 +62,51 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         enemies.Remove(enemy);
     }
 
-    //GameOver is called when the player reaches 0 food points
+    // GameOver is called when the player reaches 0 food points
     public void GameOver()
     {
         //Disable this GameManager.
         enabled = false;
     }
 
-    //Coroutine to move enemies in sequence.
-    IEnumerator MoveEnemies()
+    private void InitGame()
     {
-        //While enemiesMoving is true player is unable to move.
+        if (PhotonNetwork.IsMasterClient)
+        {
+            // Do setup..
+
+            // Create a networked player object for each player that loads into the multiplayer scenes.
+            for (int i = 0; i < PhotonNetwork.PlayerList.Length; i++)
+            {
+                Photon.Realtime.Player player = PhotonNetwork.PlayerList[i];
+
+                // Instantiate the Player prefab on every client
+                GameObject go = PhotonNetwork.Instantiate(
+                    Path.Combine("PhotonPrefabs", "Player"),
+                    _playerSpawnPositions[i].position,
+                    _playerSpawnPositions[i].rotation
+                );
+
+                PhotonView pv = go.GetComponent<PhotonView>();
+                pv.TransferOwnership(player);
+                Debug.Log("1 - transfered ownership");
+            }
+        }
+        
+        // Clear any Enemy objects in our List to prepare for next level.
+        enemies.Clear();
+    }
+
+    // Coroutine to move enemies in sequence.
+    private IEnumerator MoveEnemies()
+    {
+        // While enemiesMoving is true player is unable to move.
         enemiesMoving = true;
 
-        //If there are no enemies spawned (IE in first level):
+        // If there are no enemies spawned (IE in first level):
         if (enemies.Count == 0)
         {
-            //Wait for turnDelay seconds between moves, replaces delay caused by enemies moving when there are none.
+            // Wait for turnDelay seconds between moves, replaces delay caused by enemies moving when there are none.
             yield return new WaitForSeconds(turnDelay);
         }
         else
@@ -84,12 +114,12 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
             _enemiesMovingPanel.SetActive(true);
         }
 
-        //Loop through List of Enemy objects.
+        // Loop through List of Enemy objects.
         for (int i = 0; i < enemies.Count; i++)
         {
             enemies[i].Move();
 
-            //Wait for Enemy's moveTime before moving next Enemy,
+            // Wait for Enemy's moveTime before moving next Enemy,
             while (enemies[i].IsMoving)
             {
                 yield return null;
@@ -98,11 +128,24 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
 
         // Enemies are done moving, set playersTurn to true so player can move.
         playersTurn = true;
-        GameSetupController.LocalPlayer.StartTurn();
+        LocalPlayer.StartTurn();
 
         // Enemies are done moving, set enemiesMoving to false.
         enemiesMoving = false;
 
         _enemiesMovingPanel.SetActive(false);
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (_playerSpawnPositions != null)
+        {
+            Vector3 size = new Vector3 (0.5f, 0.5f, 0.5f);
+            for (int i = 0; i < _playerSpawnPositions.Length; i++)
+            {
+                Gizmos.color = Color.cyan;
+                Gizmos.DrawWireCube(_playerSpawnPositions[i].position, size);
+            }
+        }
     }
 }

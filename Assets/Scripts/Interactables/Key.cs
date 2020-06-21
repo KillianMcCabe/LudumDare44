@@ -22,7 +22,7 @@ public class Key : InteractableObject
 
     public override void Interact()
     {
-        GameSetupController.LocalPlayer.HasKey = true;
+        GameManager.LocalPlayer.HasKey = true;
         currentNodePosition.InteractableObject = null;
         MessageLogController.Instance.AddMessage("You found a key.");
         GameObject.Destroy(gameObject);
