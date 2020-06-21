@@ -49,7 +49,7 @@ public class Door : InteractableObject
     {
         if (_state == State.Locked)
         {
-            if (Player.Instance.HasKey)
+            if (GameSetupController.LocalPlayer.HasKey)
             {
                 _occupiedNavNode.InteractableObject = null;
                 MessageLogController.Instance.AddMessage("You unlocked the door using a key.");

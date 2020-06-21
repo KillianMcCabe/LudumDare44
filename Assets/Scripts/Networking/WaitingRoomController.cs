@@ -48,15 +48,15 @@ public class WaitingRoomController : MonoBehaviourPunCallbacks
         PlayerCountUpdate();
     }
 
-    public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer)
+    public override void OnPlayerEnteredRoom(Photon.Realtime.Player player)
     {
-        Debug.Log("OnPlayerEnteredRoom");
+        Debug.Log(player.NickName + " has joined the room");
         PlayerCountUpdate();
     }
 
-    public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
+    public override void OnPlayerLeftRoom(Photon.Realtime.Player player)
     {
-        Debug.Log("OnPlayerLeftRoom");
+        Debug.Log(player.NickName + " has left the room");
         PlayerCountUpdate();
     }
 

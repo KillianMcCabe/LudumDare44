@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using Photon.Pun;
 
 public class Player : Mob
 {
@@ -16,6 +17,7 @@ public class Player : Mob
 
     const float moveSpeed = 6f;
 
+    PhotonView _photonView;
     NavNode currentNodePosition;
     NavNode _clickedNavNode;
     List<NavNode> pathing;
@@ -24,7 +26,6 @@ public class Player : Mob
     Coroutine pathingCoroutine;
 
     public bool HasKey = false;
-    public static Player Instance;
     public bool acceptingInput = true;
 
     int speed = 6;
@@ -46,33 +47,25 @@ public class Player : Mob
         get { return transform.position; }
     }
 
-    /// <summary>
-    /// Awake is called when the script instance is being loaded.
-    /// </summary>
-    void Awake()
+    private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else if (Instance != this)
-        {
-            Destroy(gameObject);
-        }
+        _photonView = GetComponent<PhotonView>();
     }
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         // get current position on node grid
         currentNodePosition = NavigationGrid.Instance.GetNode(new Vector2(transform.position.x, transform.position.y));
         currentNodePosition.Mob = this;
 
-        Debug.Log("Player is at " + currentNodePosition);
+        Debug.Log("Player \"" + _photonView.Owner.NickName + "\" is at " + currentNodePosition);
 
-        acceptingInput = true;
+        if (_photonView.IsMine)
+        {
+            acceptingInput = true;
 
-        NavNode.OnNodeClicked += HandleNodeClicked;
+            NavNode.OnNodeClicked += HandleNodeClicked;
+        }
     }
 
     private void SetState(State state)
@@ -115,7 +108,6 @@ public class Player : Mob
         }
     }
 
-    // Update is called once per frame
     private IEnumerator PathingCoroutine()
     {
         while (pathing.Count > 0)

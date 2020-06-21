@@ -50,7 +50,7 @@ public class Enemy : Mob
 
                 _isMoving = true;
 
-                pathing = Pathing.CalculatePath(currentNodePosition, Player.Instance.NodePosition);
+                pathing = Pathing.CalculatePath(currentNodePosition, GameSetupController.LocalPlayer.NodePosition);
                 if (pathingCoroutine != null)
                 {
                     StopCoroutine(pathingCoroutine);

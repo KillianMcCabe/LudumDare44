@@ -4,50 +4,39 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-// This script will be added to any multiplayer scene
 public class GameSetupController : MonoBehaviour
 {
-    enum GamePhase
-    {
-        None,
-        Setup,
-        OutOfCombat,
-        Dialogue,
-        Combat
-    }
+    public static Player LocalPlayer = null;
 
-    private GamePhase _gamePhase;
+    [SerializeField]
+    private Transform[] _playerSpawnPositions = null;
 
-
-    void Awake()
+    private void Awake()
     {
         // Create a networked player object for each player that loads into the multiplayer scenes.
         EnsureLocalPlayerExists();
 
-        _gamePhase = GamePhase.Setup;
-    }
-
-    void Update()
-    {
-        switch (_gamePhase)
+        if (PhotonNetwork.IsMasterClient)
         {
-            case GamePhase.Setup:
-                GameSetup();
-                break;
+            // do setup..
+            
         }
     }
 
     private void EnsureLocalPlayerExists()
     {
-        if (PlayerManager.LocalPlayerInstance == null)
+        if (LocalPlayer == null)
         {
             Debug.LogFormat("We are Instantiating LocalPlayer from {0}", SceneManagerHelper.ActiveSceneName);
 
-            // Instantiate the PhotonPlayer prefab on every client
-            GameObject gameObject = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "PhotonPlayer"), Vector3.zero, Quaternion.identity);
-            PlayerManager player = gameObject.GetComponent<PlayerManager>();
+            // Instantiate the Player prefab on every client
+            GameObject go = PhotonNetwork.Instantiate(
+                Path.Combine("PhotonPrefabs", "Player"),
+                _playerSpawnPositions[0].position,
+                _playerSpawnPositions[0].rotation
+            );
 
-            PlayerManager.LocalPlayerInstance = player;
+            LocalPlayer = go.GetComponent<Player>();
         }
         else
         {
@@ -55,27 +44,16 @@ public class GameSetupController : MonoBehaviour
         }
     }
 
-    public void TakeDamage()
+    private void OnDrawGizmos()
     {
-        PlayerManager.LocalPlayerInstance.Health --;
-    }
-
-    private void GameSetup()
-    {
-        if (PhotonNetwork.IsMasterClient)
+        if (_playerSpawnPositions != null)
         {
-            if (PlayerManager.LocalPlayerInstance != null)
+            Vector3 size = new Vector3 (0.5f, 0.5f, 0.5f);
+            for (int i = 0; i < _playerSpawnPositions.Length; i++)
             {
-                // _playerInfo.SetPlayer(PlayerManager.LocalPlayerInstance);
+                Gizmos.color = Color.cyan;
+                Gizmos.DrawWireCube(_playerSpawnPositions[i].position, size);
             }
-
-            // do setup..
-
-            _gamePhase = GamePhase.OutOfCombat;
-        }
-        else
-        {
-            // wait for master client to complete setup
         }
     }
 }

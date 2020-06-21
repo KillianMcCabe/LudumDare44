@@ -36,7 +36,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     {
         yield return null;
         NavigationGrid.Instance.Lighting.Recalculate();
-        Player.Instance.StartTurn();
+        GameSetupController.LocalPlayer.StartTurn();
     }
 
     //Update is called every frame.
@@ -98,7 +98,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
 
         // Enemies are done moving, set playersTurn to true so player can move.
         playersTurn = true;
-        Player.Instance.StartTurn();
+        GameSetupController.LocalPlayer.StartTurn();
 
         // Enemies are done moving, set enemiesMoving to false.
         enemiesMoving = false;
