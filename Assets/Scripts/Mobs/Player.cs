@@ -15,9 +15,6 @@ public class Player : Mob
         Acting
     }
 
-    const float moveSpeed = 6f;
-
-    PhotonView _photonView;
     NavNode currentNodePosition;
     NavNode _clickedNavNode;
     List<NavNode> pathing;
@@ -47,20 +44,15 @@ public class Player : Mob
         get { return transform.position; }
     }
 
-    private void Awake()
-    {
-        _photonView = GetComponent<PhotonView>();
-    }
-
     private void Start()
     {
         // get current position on node grid
         currentNodePosition = NavigationGrid.Instance.GetNode(new Vector2(transform.position.x, transform.position.y));
         currentNodePosition.Mob = this;
 
-        Debug.Log("Player \"" + _photonView.Owner.NickName + "\" is at " + currentNodePosition);
+        Debug.Log("Player \"" + photonView.Owner.NickName + "\" is at " + currentNodePosition);
 
-        if (_photonView.IsMine)
+        if (photonView.IsMine)
         {
             GameManager.LocalPlayer = this;
             acceptingInput = true;
@@ -144,7 +136,7 @@ public class Player : Mob
                 // move to new position
                 while (transform.position != moveToPosition)
                 {
-                    transform.position = Vector2.MoveTowards(transform.position, nextNode.WorldPosition, Time.deltaTime * moveSpeed);
+                    transform.position = Vector2.MoveTowards(transform.position, nextNode.WorldPosition, Time.deltaTime * MoveSpeed);
                     yield return null;
                 }
 
@@ -153,7 +145,7 @@ public class Player : Mob
                 currentNodePosition.Mob = this;
             }
 
-            NavigationGrid.Instance.Lighting.Recalculate(); // TODO: move into GameManager.cs
+            NavigationGrid.Instance.Lighting.Recalculate(this); // TODO: move into GameManager.cs
         }
 
         // check if we stopped on an item

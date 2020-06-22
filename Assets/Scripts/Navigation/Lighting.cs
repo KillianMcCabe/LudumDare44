@@ -41,12 +41,14 @@ public class Lighting
                 _lightNodeGrid[x, y] = newLightNode;
             }
         }
+
+        Debug.Log("LightGrid ready");
     }
 
     /// <summary>
-    /// Recalculates lighting
+    /// Recalculates lighting from players viewpoint
     /// </summary>
-    public void Recalculate()
+    public void Recalculate(Player player)
     {
         // start by setting all nodes to dark
         foreach (NavNode navNode in NavigationGrid.Instance.NodeGrid)
@@ -60,7 +62,7 @@ public class Lighting
         // check all light nodes
         foreach (LightNode lightNode in _lightNodeGrid)
         {
-            Vector2 towardsPlayer = GameManager.LocalPlayer.WorldPosition - lightNode.WorldPosition;
+            Vector2 towardsPlayer = player.WorldPosition - lightNode.WorldPosition;
             float dist = towardsPlayer.magnitude;
             // check if within light range
             if (dist < LightRange)

@@ -13,10 +13,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     public int playerFoodPoints = 100;                      // Starting value for Player food points.
 
     [System.NonSerialized]
-    public bool playersTurn = true;                         // Boolean to check if it's players turn, hidden in inspector but public.
-
-    [SerializeField]
-    private NavigationGrid _navigationGrid = null;
+    public bool playersTurn = true;                         // Boolean to check if it's players turn
 
     [SerializeField]
     private GameObject _enemiesMovingPanel = null;
@@ -34,11 +31,12 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
 
     private IEnumerator Start()
     {
-        // Wait for local player to be assigned
-        while (LocalPlayer == null)
-            yield return null;
+        EnsureLocalPlayerExists();
 
-        NavigationGrid.Instance.Lighting.Recalculate();
+        // TODO: figure out why this is needed and remove it
+        yield return null;
+
+        NavigationGrid.Instance.Lighting.Recalculate(LocalPlayer);
         LocalPlayer.StartTurn();
     }
 
@@ -51,7 +49,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         StartCoroutine(MoveEnemies());
     }
 
-    // Call this to add the passed in Enemy to the List of Enemy objects.
+    // Call this to add an Enemy to the enemy list tracked by the GameManager
     public void AddEnemyToList(Enemy enemy)
     {
         enemies.Add(enemy);
@@ -74,25 +72,8 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         if (PhotonNetwork.IsMasterClient)
         {
             // Do setup..
-
-            // Create a networked player object for each player that loads into the multiplayer scenes.
-            for (int i = 0; i < PhotonNetwork.PlayerList.Length; i++)
-            {
-                Photon.Realtime.Player player = PhotonNetwork.PlayerList[i];
-
-                // Instantiate the Player prefab on every client
-                GameObject go = PhotonNetwork.Instantiate(
-                    Path.Combine("PhotonPrefabs", "Player"),
-                    _playerSpawnPositions[i].position,
-                    _playerSpawnPositions[i].rotation
-                );
-
-                PhotonView pv = go.GetComponent<PhotonView>();
-                pv.TransferOwnership(player);
-                Debug.Log("1 - transfered ownership");
-            }
         }
-        
+
         // Clear any Enemy objects in our List to prepare for next level.
         enemies.Clear();
     }
@@ -134,6 +115,37 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         enemiesMoving = false;
 
         _enemiesMovingPanel.SetActive(false);
+    }
+
+    private void EnsureLocalPlayerExists()
+    {
+        if (LocalPlayer == null)
+        {
+            Debug.LogFormat("We are Instantiating LocalPlayer from {0}", SceneManagerHelper.ActiveSceneName);
+
+            // find spawn point which matches our player's index in the player list
+            for (int spawnIndex = 0; spawnIndex < PhotonNetwork.PlayerList.Length; spawnIndex++)
+            {
+                if (PhotonNetwork.PlayerList[spawnIndex].IsLocal)
+                {
+                    // Instantiate the Player prefab on every client
+                    GameObject go = PhotonNetwork.Instantiate(
+                        Path.Combine("PhotonPrefabs", "Player"),
+                        _playerSpawnPositions[spawnIndex].position,
+                        _playerSpawnPositions[spawnIndex].rotation
+                    );
+
+                    LocalPlayer = go.GetComponent<Player>();
+                    return;
+                }
+            }
+
+            Debug.LogError("FATAL: Failed to find spawn point to instantiate player at!");
+        }
+        else
+        {
+            Debug.LogFormat("Ignoring scene load for {0}", SceneManagerHelper.ActiveSceneName);
+        }
     }
 
     private void OnDrawGizmos()

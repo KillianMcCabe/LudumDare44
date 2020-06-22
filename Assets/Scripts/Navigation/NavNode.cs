@@ -18,7 +18,7 @@ public class NavNode : MonoBehaviour , IHeapItem<NavNode>
 
     private Vector2Int _worldPosition;
     int heapIndex;
-    bool _visible = true;
+    bool _visible = false;
     bool _hasBeenSeen = false;
     bool _walkable = true;
     bool _blocked = false;

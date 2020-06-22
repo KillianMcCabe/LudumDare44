@@ -43,7 +43,7 @@ public class NavigationGrid : SingletonMonoBehaviour<NavigationGrid>
         _navNodeFloorLayerMask = LayerMask.GetMask("NavNode_Floor");
         _nodeGridParent = new GameObject("Node Grid");
 
-        GenerateNodes(); // TODO: Calculate this in Editor
+        GenerateNodes();
     }
 
     public int navGridSizeX = 0, navGridSizeY = 0;
@@ -130,6 +130,8 @@ public class NavigationGrid : SingletonMonoBehaviour<NavigationGrid>
                 }
             }
         }
+
+        Debug.Log("NavigationGrid ready");
 
         _lighting = new Lighting();
         _lighting.InitialiseLightGrid(gridMinWorldX, gridMinWorldY);
