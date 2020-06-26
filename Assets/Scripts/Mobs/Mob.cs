@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-public abstract class Mob : MonoBehaviourPunCallbacks
+namespace PaperDungeons
 {
-    public const float MoveSpeed = 6f;
+    public abstract class Mob : MonoBehaviourPunCallbacks
+    {
+        public const float MoveSpeed = 6f;
 
-    public abstract void ReceiveAttack(int attackPower);
+        public abstract void ReceiveAttack(int attackPower);
+    }
 }

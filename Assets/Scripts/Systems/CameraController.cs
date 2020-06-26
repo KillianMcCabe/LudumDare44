@@ -2,23 +2,26 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraController : MonoBehaviour
+namespace PaperDungeons
 {
-    public Transform FocusOnObject;
-
-    float zPos;
-
-    // Start is called before the first frame update
-    void Awake()
+    public class CameraController : MonoBehaviour
     {
-        zPos = transform.position.z;
-    }
+        public Transform FocusOnObject;
 
-    void LateUpdate()
-    {
-        if (FocusOnObject != null)
+        float zPos;
+
+        // Start is called before the first frame update
+        void Awake()
         {
-            transform.position = new Vector3(FocusOnObject.position.x, FocusOnObject.position.y, zPos);
+            zPos = transform.position.z;
+        }
+
+        void LateUpdate()
+        {
+            if (FocusOnObject != null)
+            {
+                transform.position = new Vector3(FocusOnObject.position.x, FocusOnObject.position.y, zPos);
+            }
         }
     }
 }

@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 
-interface IInteractable
+namespace PaperDungeons
 {
-    void Interact();
+    interface IInteractable
+    {
+        void Interact();
+    }
 }

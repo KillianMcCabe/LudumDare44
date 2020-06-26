@@ -2,29 +2,32 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Key : InteractableObject
+namespace PaperDungeons
 {
-    NavNode currentNodePosition;
-
-    // Start is called before the first frame update
-    void Start()
+    public class Key : InteractableObject
     {
-        currentNodePosition = NavigationGrid.Instance.GetNode(new Vector2(transform.position.x, transform.position.y));
-        currentNodePosition.InteractableObject = this;
-        Debug.Log("key is at " + currentNodePosition.WorldPosition);
-    }
+        NavNode currentNodePosition;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+        // Start is called before the first frame update
+        void Start()
+        {
+            currentNodePosition = NavigationGrid.Instance.GetNode(new Vector2(transform.position.x, transform.position.y));
+            currentNodePosition.InteractableObject = this;
+            Debug.Log("key is at " + currentNodePosition.WorldPosition);
+        }
 
-    public override void Interact()
-    {
-        GameManager.LocalPlayer.HasKey = true;
-        currentNodePosition.InteractableObject = null;
-        MessageLogController.Instance.AddMessage("You found a key.");
-        GameObject.Destroy(gameObject);
+        // Update is called once per frame
+        void Update()
+        {
+            
+        }
+
+        public override void Interact()
+        {
+            GameManager.LocalPlayer.HasKey = true;
+            currentNodePosition.InteractableObject = null;
+            MessageLogController.Instance.AddMessage("You found a key.");
+            GameObject.Destroy(gameObject);
+        }
     }
 }

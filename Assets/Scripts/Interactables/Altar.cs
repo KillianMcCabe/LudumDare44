@@ -2,33 +2,36 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Altar : InteractableObject
+namespace PaperDungeons
 {
-    public bool boonGranted = false;
-    public GameObject choiceOfGreed;
-
-    // Start is called before the first frame update
-    void Start()
+    public class Altar : InteractableObject
     {
-        NavNode node1 = NavigationGrid.Instance.GetNode(new Vector2(transform.position.x,     transform.position.y));
-        node1.InteractableObject = this;
-        node1.Blocked = true;
-        NavNode node2 = NavigationGrid.Instance.GetNode(new Vector2(transform.position.x + 1, transform.position.y));
-        node2.InteractableObject = this;
-        node2.Blocked = true;
-    }
+        public bool boonGranted = false;
+        public GameObject choiceOfGreed;
 
-    public override void Interact()
-    {
-        if (!boonGranted)
+        // Start is called before the first frame update
+        void Start()
         {
-            MessageLogController.Instance.AddMessage("You sense a greedy presense...");
-            choiceOfGreed.SetActive(true);
-            boonGranted = true;
+            NavNode node1 = NavigationGrid.Instance.GetNode(new Vector2(transform.position.x,     transform.position.y));
+            node1.InteractableObject = this;
+            node1.Blocked = true;
+            NavNode node2 = NavigationGrid.Instance.GetNode(new Vector2(transform.position.x + 1, transform.position.y));
+            node2.InteractableObject = this;
+            node2.Blocked = true;
         }
-        else
+
+        public override void Interact()
         {
-            MessageLogController.Instance.AddMessage("There's nothing else to do here.");
+            if (!boonGranted)
+            {
+                MessageLogController.Instance.AddMessage("You sense a greedy presense...");
+                choiceOfGreed.SetActive(true);
+                boonGranted = true;
+            }
+            else
+            {
+                MessageLogController.Instance.AddMessage("There's nothing else to do here.");
+            }
         }
     }
 }

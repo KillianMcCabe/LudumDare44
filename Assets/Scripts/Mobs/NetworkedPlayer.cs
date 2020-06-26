@@ -3,48 +3,51 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-public class NetworkedPlayer : MonoBehaviourPun, IPunObservable
+namespace PaperDungeons
 {
-    private const float MaxLagOffset = 2;
-
-    private Vector3 _correctPlayerPos = Vector3.zero;
-    private Player _player;
-
-    private void Awake()
+    public class NetworkedPlayer : MonoBehaviourPun, IPunObservable
     {
-        _player = GetComponent<Player>();
-    }
+        private const float MaxLagOffset = 2;
 
-    private void Update()
-    {
-        if (photonView.IsMine)
-            return;
+        private Vector3 _correctPlayerPos = Vector3.zero;
+        private Player _player;
 
-        Vector3 lagPositionOffset = transform.position - _correctPlayerPos;
-
-        // teleport the player if lag is too great
-        if (lagPositionOffset.magnitude >= MaxLagOffset)
-            transform.position = _correctPlayerPos;
-
-        // lerp towards correct position
-        transform.position = Vector3.MoveTowards(transform.position, _correctPlayerPos, Time.deltaTime * Mob.MoveSpeed);
-    }
-
-    #region IPunObservable implementation
-
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        if (stream.IsWriting)
+        private void Awake()
         {
-            // We own this player: send the others our data
-            stream.SendNext(transform.position);
+            _player = GetComponent<Player>();
         }
-        else
-        {
-            // Network player, receive data
-            _correctPlayerPos = (Vector3)stream.ReceiveNext();
-        }
-    }
 
-    #endregion
+        private void Update()
+        {
+            if (photonView.IsMine)
+                return;
+
+            Vector3 lagPositionOffset = transform.position - _correctPlayerPos;
+
+            // teleport the player if lag is too great
+            if (lagPositionOffset.magnitude >= MaxLagOffset)
+                transform.position = _correctPlayerPos;
+
+            // lerp towards correct position
+            transform.position = Vector3.MoveTowards(transform.position, _correctPlayerPos, Time.deltaTime * Mob.MoveSpeed);
+        }
+
+        #region IPunObservable implementation
+
+        public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+        {
+            if (stream.IsWriting)
+            {
+                // We own this player: send the others our data
+                stream.SendNext(transform.position);
+            }
+            else
+            {
+                // Network player, receive data
+                _correctPlayerPos = (Vector3)stream.ReceiveNext();
+            }
+        }
+
+        #endregion
+    }
 }

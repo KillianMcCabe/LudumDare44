@@ -1,9 +1,12 @@
 ﻿using UnityEngine;
 
-public abstract class InteractableObject : MonoBehaviour, IInteractable
+namespace PaperDungeons
 {
-    public abstract void Interact();
+    public abstract class InteractableObject : MonoBehaviour, IInteractable
+    {
+        public abstract void Interact();
 
-    // TODO: right-click = inspect
-    // public abstract void Inspect();
+        // TODO: right-click = inspect
+        // public abstract void Inspect();
+    }
 }

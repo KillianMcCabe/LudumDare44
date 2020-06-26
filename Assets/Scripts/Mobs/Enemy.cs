@@ -2,117 +2,120 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy : Mob
+namespace PaperDungeons
 {
-    enum State
+    public class Enemy : Mob
     {
-        Sleeping,
-        Wandering,
-        Aggravated
-    }
-
-    private bool _isMoving;
-    public bool IsMoving
-    {
-        get { return _isMoving; }
-    }
-
-    public int strength;
-    public int armor;
-    public int health;
-
-    private State _state;
-    private NavNode currentNodePosition;
-    private List<NavNode> pathing;
-    Coroutine pathingCoroutine;
-
-    private void Start()
-    {
-        currentNodePosition = NavigationGrid.Instance.GetNode(new Vector2(transform.position.x, transform.position.y));
-        currentNodePosition.Mob = this;
-
-        GameManager.Instance.AddEnemyToList(this);
-
-        _state = State.Sleeping;
-        _isMoving = false;
-    }
-
-    public void Move()
-    {
-        switch (_state)
+        enum State
         {
-            case State.Sleeping:
-                break;
-            case State.Wandering:
-                break;
-            case State.Aggravated:
-
-                _isMoving = true;
-
-                pathing = Pathing.CalculatePath(currentNodePosition, GameManager.LocalPlayer.NodePosition);
-                if (pathingCoroutine != null)
-                {
-                    StopCoroutine(pathingCoroutine);
-                }
-                pathingCoroutine = StartCoroutine(PathingCoroutine());
-                
-                break;
+            Sleeping,
+            Wandering,
+            Aggravated
         }
-    }
 
-    public override void ReceiveAttack(int attackPower)
-    {
-        _state = State.Aggravated;
-
-        int damage = Mathf.Max(attackPower - armor, 0);
-        health -= damage;
-        MessageLogController.Instance.AddMessage($"You dealt {damage} damage to the Slime.");
-        if (health <= 0)
+        private bool _isMoving;
+        public bool IsMoving
         {
-            MessageLogController.Instance.AddMessage("You killed the Slime.");
-            currentNodePosition.Mob = null;
-            GameManager.Instance.RemoveEnemyFromList(this);
-            GameObject.Destroy(gameObject);
+            get { return _isMoving; }
         }
-    }
 
-    // Update is called once per frame
-    private IEnumerator PathingCoroutine()
-    {
-        while (pathing.Count > 0)
+        public int strength;
+        public int armor;
+        public int health;
+
+        private State _state;
+        private NavNode currentNodePosition;
+        private List<NavNode> pathing;
+        Coroutine pathingCoroutine;
+
+        private void Start()
         {
-            // pop node
-            NavNode nextNode = pathing[0];
-            pathing.RemoveAt(0);
+            currentNodePosition = NavigationGrid.Instance.GetNode(new Vector2(transform.position.x, transform.position.y));
+            currentNodePosition.Mob = this;
 
-            // check if the path is blocked by an object e.g. door
-            if (nextNode.InteractableObject != null && nextNode.Blocked)
+            GameManager.Instance.AddEnemyToList(this);
+
+            _state = State.Sleeping;
+            _isMoving = false;
+        }
+
+        public void Move()
+        {
+            switch (_state)
             {
-                _isMoving = false;
-                yield break;
+                case State.Sleeping:
+                    break;
+                case State.Wandering:
+                    break;
+                case State.Aggravated:
+
+                    _isMoving = true;
+
+                    pathing = Pathing.CalculatePath(currentNodePosition, GameManager.LocalPlayer.NodePosition);
+                    if (pathingCoroutine != null)
+                    {
+                        StopCoroutine(pathingCoroutine);
+                    }
+                    pathingCoroutine = StartCoroutine(PathingCoroutine());
+                    
+                    break;
             }
-            // check if the path is blocked by a mob
-            else if (nextNode.Mob != null)
+        }
+
+        public override void ReceiveAttack(int attackPower)
+        {
+            _state = State.Aggravated;
+
+            int damage = Mathf.Max(attackPower - armor, 0);
+            health -= damage;
+            MessageLogController.Instance.AddMessage($"You dealt {damage} damage to the Slime.");
+            if (health <= 0)
             {
-                // is the mob a player?
-                if (nextNode.Mob is Player)
-                {
-                    // attack the player
-                    nextNode.Mob.ReceiveAttack(strength);
-                }
-                _isMoving = false;
-                yield break;
-            }
-            else
-            {
+                MessageLogController.Instance.AddMessage("You killed the Slime.");
                 currentNodePosition.Mob = null;
-                currentNodePosition = nextNode;
-                currentNodePosition.Mob = this;
-                // transform.position = currentNodePosition.WorldPosition;
+                GameManager.Instance.RemoveEnemyFromList(this);
+                GameObject.Destroy(gameObject);
             }
-            yield return new WaitForSeconds(0.25f);
         }
 
-        _isMoving = false;
+        // Update is called once per frame
+        private IEnumerator PathingCoroutine()
+        {
+            while (pathing.Count > 0)
+            {
+                // pop node
+                NavNode nextNode = pathing[0];
+                pathing.RemoveAt(0);
+
+                // check if the path is blocked by an object e.g. door
+                if (nextNode.InteractableObject != null && nextNode.Blocked)
+                {
+                    _isMoving = false;
+                    yield break;
+                }
+                // check if the path is blocked by a mob
+                else if (nextNode.Mob != null)
+                {
+                    // is the mob a player?
+                    if (nextNode.Mob is Player)
+                    {
+                        // attack the player
+                        nextNode.Mob.ReceiveAttack(strength);
+                    }
+                    _isMoving = false;
+                    yield break;
+                }
+                else
+                {
+                    currentNodePosition.Mob = null;
+                    currentNodePosition = nextNode;
+                    currentNodePosition.Mob = this;
+                    // transform.position = currentNodePosition.WorldPosition;
+                }
+                yield return new WaitForSeconds(0.25f);
+            }
+
+            _isMoving = false;
+        }
     }
 }

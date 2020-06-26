@@ -1,36 +1,39 @@
 ﻿using UnityEngine;
 
-public class MessageLogController : SingletonMonoBehaviour<MessageLogController>
+namespace PaperDungeons
 {
-    [SerializeField]
-    GameObject _messageList = null;
-
-    [SerializeField]
-    GameObject _messageLogItemPrefab = null;
-
-    public enum MessageType
+    public class MessageLogController : SingletonMonoBehaviour<MessageLogController>
     {
-        Info,
-        Warning,
-        Success
-    }
+        [SerializeField]
+        GameObject _messageList = null;
 
-    public void AddMessage(string message, MessageType messageType = MessageType.Info)
-    {
-        Debug.Log(message);
+        [SerializeField]
+        GameObject _messageLogItemPrefab = null;
 
-        GameObject newMessage = GameObject.Instantiate(_messageLogItemPrefab);
-        newMessage.transform.SetParent(_messageList.transform);
-        newMessage.transform.SetAsLastSibling();
-        newMessage.GetComponent<TMPro.TMP_Text>().text = message;
-
-        if (messageType == MessageType.Warning)
+        public enum MessageType
         {
-            newMessage.GetComponent<TMPro.TMP_Text>().color = Color.red;
+            Info,
+            Warning,
+            Success
         }
-        else if (messageType == MessageType.Success)
+
+        public void AddMessage(string message, MessageType messageType = MessageType.Info)
         {
-            newMessage.GetComponent<TMPro.TMP_Text>().color = Color.green;
+            Debug.Log(message);
+
+            GameObject newMessage = GameObject.Instantiate(_messageLogItemPrefab);
+            newMessage.transform.SetParent(_messageList.transform);
+            newMessage.transform.SetAsLastSibling();
+            newMessage.GetComponent<TMPro.TMP_Text>().text = message;
+
+            if (messageType == MessageType.Warning)
+            {
+                newMessage.GetComponent<TMPro.TMP_Text>().color = Color.red;
+            }
+            else if (messageType == MessageType.Success)
+            {
+                newMessage.GetComponent<TMPro.TMP_Text>().color = Color.green;
+            }
         }
     }
 }
