@@ -52,6 +52,8 @@ namespace PaperDungeons
         /// </summary>
         public void Recalculate(Player player)
         {
+            Debug.Log("recaulculating lighting...");
+
             // start by resetting all nodes to not visible
             foreach (NavNode navNode in NavigationGrid.Instance.NodeGrid)
             {

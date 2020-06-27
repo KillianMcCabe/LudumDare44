@@ -44,12 +44,19 @@ namespace PaperDungeons
         public Vector2 WorldPosition
         {
             get { return transform.position; }
+            set
+            {
+                transform.position = value;
+                _currentNodePosition.Mob = null;
+                _currentNodePosition = NavigationGrid.Instance.GetNode(transform.position);
+                _currentNodePosition.Mob = this;
+            }
         }
 
         private void Awake()
         {
             // get current position on node grid
-            _currentNodePosition = NavigationGrid.Instance.GetNode(new Vector2(transform.position.x, transform.position.y));
+            _currentNodePosition = NavigationGrid.Instance.GetNode(transform.position);
             _currentNodePosition.Mob = this;
 
             Debug.Log("Player \"" + photonView.Owner.NickName + "\" is at " + _currentNodePosition);
@@ -122,7 +129,7 @@ namespace PaperDungeons
                     yield break;
                 }
                 // check if the path is blocked by an enemy
-                else if (nextNode.Mob != null)
+                else if (nextNode.Mob != null && nextNode.Mob is Enemy)
                 {
                     nextNode.Mob.ReceiveAttack(strength);
 

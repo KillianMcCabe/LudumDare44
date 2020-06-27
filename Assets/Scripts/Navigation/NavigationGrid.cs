@@ -48,6 +48,8 @@ namespace PaperDungeons
         private int gridMinWorldY = int.MaxValue;
         private int gridMaxWorldY = int.MinValue;
 
+        private bool _lightingDirtied = false;
+
         private void Awake()
         {
             _collisionLayerMask = LayerMask.GetMask("TileMap");
@@ -55,6 +57,15 @@ namespace PaperDungeons
             _nodeGridParent = new GameObject("Node Grid");
 
             GenerateNodes();
+        }
+
+        private void FixedUpdate()
+        {
+            if (_lightingDirtied)
+            {
+                _lightingDirtied = false;
+                Lighting.Recalculate(GameManager.LocalPlayer);
+            }
         }
 
         /// Generate a grid of nodes, ready to be used by a-star algorigthm
@@ -81,6 +92,7 @@ namespace PaperDungeons
                         navNode.Walkable = true;
                         navNode.BlocksLight = false;
                     }
+                    navNode.OnBlocksLightStateChange += HandleLightingDirtied;
 
                     unsortedNodes.Add(navNode);
 
@@ -169,6 +181,11 @@ namespace PaperDungeons
             }
 
             return neightbours;
+        }
+
+        private void HandleLightingDirtied()
+        {
+            _lightingDirtied = true;
         }
 
         void OnDrawGizmos()

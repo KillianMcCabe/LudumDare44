@@ -9,6 +9,7 @@ namespace PaperDungeons
     public class NavNode : MonoBehaviour , IHeapItem<NavNode>
     {
         public static Action<NavNode> OnNodeClicked;
+        public Action OnBlocksLightStateChange;
 
         public int gCost;
         public int hCost;
@@ -56,6 +57,7 @@ namespace PaperDungeons
             set {
                 _blocksLight = value;
                 UpdateLayer();
+                OnBlocksLightStateChange?.Invoke();
             }
         }
 
