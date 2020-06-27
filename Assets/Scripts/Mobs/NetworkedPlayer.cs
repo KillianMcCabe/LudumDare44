@@ -29,7 +29,7 @@ namespace PaperDungeons
                 transform.position = _correctPlayerPos;
 
             // lerp towards correct position
-            transform.position = Vector3.MoveTowards(transform.position, _correctPlayerPos, Time.deltaTime * Mob.MoveSpeed);
+            _player.WorldPosition = Vector3.MoveTowards(transform.position, _correctPlayerPos, Time.deltaTime * Mob.MoveSpeed);
         }
 
         #region IPunObservable implementation

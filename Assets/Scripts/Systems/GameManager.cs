@@ -10,9 +10,7 @@ namespace PaperDungeons
     {
         public static Player LocalPlayer = null;
 
-        public float levelStartDelay = 2f;                      // Time to wait before starting level, in seconds.
-        public float turnDelay = 0.1f;                          // Delay between each Player turn.
-        public int playerFoodPoints = 100;                      // Starting value for Player food points.
+        private const float TurnDelay = 0.1f;                          // Delay between each Player turn.
 
         [System.NonSerialized]
         public bool playersTurn = true;                         // Boolean to check if it's players turn
@@ -38,6 +36,7 @@ namespace PaperDungeons
             // Wait until the first physics step runs
             // to ensure all collider data is up to date for lighting calculations
             yield return new WaitForFixedUpdate();
+            yield return null;
 
             NavigationGrid.Instance.Lighting.Recalculate(LocalPlayer);
             LocalPlayer.StartTurn();
@@ -91,7 +90,7 @@ namespace PaperDungeons
             if (enemies.Count == 0)
             {
                 // Wait for turnDelay seconds between moves, replaces delay caused by enemies moving when there are none.
-                yield return new WaitForSeconds(turnDelay);
+                yield return new WaitForSeconds(TurnDelay);
             }
             else
             {
