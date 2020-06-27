@@ -17,7 +17,7 @@ namespace PaperDungeons
             Acting
         }
 
-        NavNode currentNodePosition;
+        NavNode _currentNodePosition;
         NavNode _clickedNavNode;
         List<NavNode> pathing;
         List<NavNode> _nodesWithinMovementRange;
@@ -38,7 +38,7 @@ namespace PaperDungeons
 
         public NavNode NodePosition
         {
-            get { return currentNodePosition; }
+            get { return _currentNodePosition; }
         }
 
         public Vector2 WorldPosition
@@ -46,17 +46,16 @@ namespace PaperDungeons
             get { return transform.position; }
         }
 
-        private void Start()
+        private void Awake()
         {
             // get current position on node grid
-            currentNodePosition = NavigationGrid.Instance.GetNode(new Vector2(transform.position.x, transform.position.y));
-            currentNodePosition.Mob = this;
+            _currentNodePosition = NavigationGrid.Instance.GetNode(new Vector2(transform.position.x, transform.position.y));
+            _currentNodePosition.Mob = this;
 
-            Debug.Log("Player \"" + photonView.Owner.NickName + "\" is at " + currentNodePosition);
+            Debug.Log("Player \"" + photonView.Owner.NickName + "\" is at " + _currentNodePosition);
 
             if (photonView.IsMine)
             {
-                GameManager.LocalPlayer = this;
                 acceptingInput = true;
 
                 NavNode.OnNodeClicked += HandleNodeClicked;
@@ -71,14 +70,14 @@ namespace PaperDungeons
             {
                 case State.DecidingWhereToMoveOrAct:
                     movementRemaining = speed;
-                    _nodesWithinMovementRange = Pathing.GetNodesWithinRange(currentNodePosition, movementRemaining);
+                    _nodesWithinMovementRange = Pathing.GetNodesWithinRange(_currentNodePosition, movementRemaining);
                     // show highlight on selectable nodes within movement range
                     for (int i = 0; i < _nodesWithinMovementRange.Count; i++)
                     {
                         _nodesWithinMovementRange[i].Highlight = Color.yellow;
                     }
 
-                    _nodesWithinView = Pathing.GetNodesWithinRange(currentNodePosition, movementRemaining);
+                    _nodesWithinView = Pathing.GetNodesWithinRange(_currentNodePosition, movementRemaining);
                     break;
             }
         }
@@ -142,21 +141,21 @@ namespace PaperDungeons
                         yield return null;
                     }
 
-                    currentNodePosition.Mob = null;
-                    currentNodePosition = nextNode;
-                    currentNodePosition.Mob = this;
+                    _currentNodePosition.Mob = null;
+                    _currentNodePosition = nextNode;
+                    _currentNodePosition.Mob = this;
                 }
 
                 NavigationGrid.Instance.Lighting.Recalculate(this); // TODO: move into GameManager.cs
             }
 
             // check if we stopped on an item
-            if (currentNodePosition.InteractableObject != null)
+            if (_currentNodePosition.InteractableObject != null)
             {
-                currentNodePosition.InteractableObject.Interact();
+                _currentNodePosition.InteractableObject.Interact();
             }
             // check if we clicked on an item which is now in interaction range
-            else if (_clickedNavNode.InteractableObject != null && currentNodePosition.neighbours.Contains(_clickedNavNode))
+            else if (_clickedNavNode.InteractableObject != null && _currentNodePosition.neighbours.Contains(_clickedNavNode))
             {
                 _clickedNavNode.InteractableObject.Interact();
             }
@@ -216,7 +215,7 @@ namespace PaperDungeons
 
             // Debug.Log("Moving to " + moveToThisNode.name);
 
-            pathing = Pathing.CalculatePath(currentNodePosition, moveToThisNode);
+            pathing = Pathing.CalculatePath(_currentNodePosition, moveToThisNode);
             if (pathing != null)
             {
                 if (pathingCoroutine != null)
@@ -238,7 +237,7 @@ namespace PaperDungeons
                     if (i == 0)
                     {
                         Gizmos.color = Color.green;
-                        Gizmos.DrawLine(currentNodePosition.WorldPositionVector3, pathing[i].WorldPositionVector3);
+                        Gizmos.DrawLine(_currentNodePosition.WorldPositionVector3, pathing[i].WorldPositionVector3);
                     }
                     else
                     {

@@ -35,8 +35,9 @@ namespace PaperDungeons
         {
             EnsureLocalPlayerExists();
 
-            // TODO: figure out why this is needed and remove it
-            yield return null;
+            // Wait until the first physics step runs
+            // to ensure all collider data is up to date for lighting calculations
+            yield return new WaitForFixedUpdate();
 
             NavigationGrid.Instance.Lighting.Recalculate(LocalPlayer);
             LocalPlayer.StartTurn();

@@ -52,7 +52,7 @@ namespace PaperDungeons
         /// </summary>
         public void Recalculate(Player player)
         {
-            // start by setting all nodes to dark
+            // start by resetting all nodes to not visible
             foreach (NavNode navNode in NavigationGrid.Instance.NodeGrid)
             {
                 if (navNode != null)
@@ -61,13 +61,13 @@ namespace PaperDungeons
                 }
             }
 
-            // check all light nodes
+            // check all light nodes for visibility
             foreach (LightNode lightNode in _lightNodeGrid)
             {
                 Vector2 towardsPlayer = player.WorldPosition - lightNode.WorldPosition;
-                float dist = towardsPlayer.magnitude;
+
                 // check if within light range
-                if (dist < LightRange)
+                if (towardsPlayer.magnitude < LightRange)
                 {
                     // check if within light of sight from player
                     RaycastHit2D hit = Physics2D.Raycast(lightNode.WorldPosition, (towardsPlayer).normalized, towardsPlayer.magnitude, _navNodeWallLayerMask);

@@ -35,11 +35,20 @@ namespace PaperDungeons
         private Lighting _lighting;
         public Lighting Lighting { get { return _lighting; } }
 
+        public int navGridSizeX = 0, navGridSizeY = 0;
+        public int lightGridSizeX = 0, lightGridSizeY = 0;
+
         private GameObject _nodeGridParent;
         private LayerMask _collisionLayerMask;
         private LayerMask _navNodeFloorLayerMask;
 
-        void Awake()
+        private int gridMinWorldX = int.MaxValue;
+        private int gridMaxWorldX = int.MinValue;
+
+        private int gridMinWorldY = int.MaxValue;
+        private int gridMaxWorldY = int.MinValue;
+
+        private void Awake()
         {
             _collisionLayerMask = LayerMask.GetMask("TileMap");
             _navNodeFloorLayerMask = LayerMask.GetMask("NavNode_Floor");
@@ -47,15 +56,6 @@ namespace PaperDungeons
 
             GenerateNodes();
         }
-
-        public int navGridSizeX = 0, navGridSizeY = 0;
-        public int lightGridSizeX = 0, lightGridSizeY = 0;
-
-        int gridMinWorldX = int.MaxValue;
-        int gridMaxWorldX = int.MinValue;
-
-        int gridMinWorldY = int.MaxValue;
-        int gridMaxWorldY = int.MinValue;
 
         /// Generate a grid of nodes, ready to be used by a-star algorigthm
         private void GenerateNodes()
