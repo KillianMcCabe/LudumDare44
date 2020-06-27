@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
+using Photon.Pun;
 
 namespace PaperDungeons
 {
-    public abstract class InteractableObject : MonoBehaviour, IInteractable
+    public abstract class InteractableObject : MonoBehaviourPunCallbacks, IInteractable
     {
         public abstract void Interact();
 

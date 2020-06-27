@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 namespace PaperDungeons
 {
@@ -43,8 +44,7 @@ namespace PaperDungeons
 
         public void SetState(State state)
         {
-            _state = state;
-            HandleStateChange();
+            photonView.RPC("RPC_UpdateState", RpcTarget.All, state);
         }
 
         public override void Interact()
@@ -102,5 +102,16 @@ namespace PaperDungeons
         {
             SetState(State.Closed);
         }
+
+        #region IPunObservable implementation
+
+        [PunRPC]
+        private void RPC_UpdateState(State newState)
+        {
+            _state = newState;
+            HandleStateChange();
+        }
+
+        #endregion
     }
 }
