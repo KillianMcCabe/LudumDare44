@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 namespace PaperDungeons
 {
@@ -24,14 +25,12 @@ namespace PaperDungeons
         public int health;
 
         private State _state;
-        private NavNode currentNodePosition;
         private List<NavNode> pathing;
         Coroutine pathingCoroutine;
 
-        private void Start()
+        protected override void Start()
         {
-            currentNodePosition = NavigationGrid.Instance.GetNode(new Vector2(transform.position.x, transform.position.y));
-            currentNodePosition.Mob = this;
+            base.Start();
 
             GameManager.Instance.AddEnemyToList(this);
 
@@ -41,6 +40,9 @@ namespace PaperDungeons
 
         public void Move()
         {
+            if (!PhotonNetwork.IsMasterClient)
+                return;
+
             switch (_state)
             {
                 case State.Sleeping:
@@ -51,7 +53,7 @@ namespace PaperDungeons
 
                     _isMoving = true;
 
-                    pathing = Pathing.CalculatePath(currentNodePosition, GameManager.LocalPlayer.NodePosition);
+                    pathing = Pathing.CalculatePath(_currentNodePosition, GameManager.LocalPlayer.NodePosition);
                     if (pathingCoroutine != null)
                     {
                         StopCoroutine(pathingCoroutine);
@@ -72,7 +74,7 @@ namespace PaperDungeons
             if (health <= 0)
             {
                 MessageLogController.Instance.AddMessage("You killed the Slime.");
-                currentNodePosition.Mob = null;
+                _currentNodePosition.Mob = null;
                 GameManager.Instance.RemoveEnemyFromList(this);
                 GameObject.Destroy(gameObject);
             }
@@ -107,10 +109,11 @@ namespace PaperDungeons
                 }
                 else
                 {
-                    currentNodePosition.Mob = null;
-                    currentNodePosition = nextNode;
-                    currentNodePosition.Mob = this;
-                    // transform.position = currentNodePosition.WorldPosition;
+                    // transform.position = _currentNodePosition.WorldPosition;
+
+                    // _currentNodePosition.Mob = null;
+                    // _currentNodePosition = nextNode;
+                    // _currentNodePosition.Mob = this;
                 }
                 yield return new WaitForSeconds(0.25f);
             }

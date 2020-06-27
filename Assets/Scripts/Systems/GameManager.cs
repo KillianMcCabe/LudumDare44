@@ -29,16 +29,9 @@ namespace PaperDungeons
             InitGame();
         }
 
-        private IEnumerator Start()
+        private void Start()
         {
             EnsureLocalPlayerExists();
-
-            // Wait until the first physics step runs
-            // to ensure all collider data is up to date for lighting calculations
-            yield return new WaitForFixedUpdate();
-            yield return null;
-
-            NavigationGrid.Instance.Lighting.Recalculate(LocalPlayer);
             LocalPlayer.StartTurn();
         }
 
@@ -138,6 +131,7 @@ namespace PaperDungeons
                         );
 
                         LocalPlayer = go.GetComponent<Player>();
+                        LocalPlayer.WorldPosition = _playerSpawnPositions[spawnIndex].position;
                         return;
                     }
                 }

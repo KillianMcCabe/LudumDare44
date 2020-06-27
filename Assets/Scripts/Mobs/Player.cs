@@ -8,7 +8,7 @@ namespace PaperDungeons
 {
     public class Player : Mob
     {
-        enum State
+        private enum State
         {
             None,
             WaitingForTurn,
@@ -17,56 +17,42 @@ namespace PaperDungeons
             Acting
         }
 
-        NavNode _currentNodePosition;
-        NavNode _clickedNavNode;
-        List<NavNode> pathing;
-        List<NavNode> _nodesWithinMovementRange;
-        List<NavNode> _nodesWithinView;
-        Coroutine pathingCoroutine;
+        private NavNode _clickedNavNode;
+        private List<NavNode> pathing;
+        private List<NavNode> _nodesWithinMovementRange;
+        private List<NavNode> _nodesWithinView;
+        private Coroutine pathingCoroutine;
 
         public bool HasKey = false;
         public bool acceptingInput = true;
 
-        int speed = 6;
-        int strength = 5;
-        int armor = 2;
-        int health = 10;
+        // stats
+        private int speed = 6;
+        private int strength = 5;
+        private int armor = 2;
+        private int health = 10;
 
         private State _state;
         private int movementRemaining = 0;
         private bool inCombat = false;
 
-        public NavNode NodePosition
+        protected override void Awake()
         {
-            get { return _currentNodePosition; }
-        }
+            base.Awake();
 
-        public Vector2 WorldPosition
-        {
-            get { return transform.position; }
-            set
-            {
-                transform.position = value;
-                _currentNodePosition.Mob = null;
-                _currentNodePosition = NavigationGrid.Instance.GetNode(transform.position);
-                _currentNodePosition.Mob = this;
-            }
-        }
-
-        private void Awake()
-        {
-            // get current position on node grid
-            _currentNodePosition = NavigationGrid.Instance.GetNode(transform.position);
-            _currentNodePosition.Mob = this;
-
-            Debug.Log("Player \"" + photonView.Owner.NickName + "\" is at " + _currentNodePosition);
-
-            if (photonView.IsMine)
+            if (_photonView.IsMine)
             {
                 acceptingInput = true;
 
                 NavNode.OnNodeClicked += HandleNodeClicked;
             }
+        }
+
+        protected override void Start()
+        {
+            base.Start();
+
+            Debug.Log("Player \"" + _photonView.Owner.NickName + "\" is at " + _currentNodePosition.name);
         }
 
         private void SetState(State state)

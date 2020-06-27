@@ -5,16 +5,16 @@ using Photon.Pun;
 
 namespace PaperDungeons
 {
-    public class NetworkedPlayer : MonoBehaviourPun, IPunObservable
+    public class NetworkedMob : MonoBehaviourPun, IPunObservable
     {
         private const float MaxLagOffset = 2;
 
-        private Vector3 _correctPlayerPos = Vector3.zero;
-        private Player _player;
+        private Vector3 _correctMobPos = Vector3.zero;
+        private Mob _mob;
 
         private void Awake()
         {
-            _player = GetComponent<Player>();
+            _mob = GetComponent<Mob>();
         }
 
         private void Update()
@@ -22,14 +22,14 @@ namespace PaperDungeons
             if (photonView.IsMine)
                 return;
 
-            Vector3 lagPositionOffset = transform.position - _correctPlayerPos;
+            Vector3 lagPositionOffset = transform.position - _correctMobPos;
 
             // teleport the player if lag is too great
             if (lagPositionOffset.magnitude >= MaxLagOffset)
-                transform.position = _correctPlayerPos;
+                transform.position = _correctMobPos;
 
             // lerp towards correct position
-            _player.WorldPosition = Vector3.MoveTowards(transform.position, _correctPlayerPos, Time.deltaTime * Mob.MoveSpeed);
+            _mob.WorldPosition = Vector3.MoveTowards(transform.position, _correctMobPos, Time.deltaTime * Mob.MoveSpeed);
         }
 
         #region IPunObservable implementation
@@ -44,7 +44,7 @@ namespace PaperDungeons
             else
             {
                 // Network player, receive data
-                _correctPlayerPos = (Vector3)stream.ReceiveNext();
+                _correctMobPos = (Vector3)stream.ReceiveNext();
             }
         }
 

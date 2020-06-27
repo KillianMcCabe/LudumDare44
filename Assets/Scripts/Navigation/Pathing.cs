@@ -69,6 +69,12 @@ namespace PaperDungeons
 
         private static void GetNodesWithinRangeBFS(NavNode currentNode, int range, List<NavNode> progress, int depth)
         {
+            if (currentNode == null)
+            {
+                Debug.LogError("currentNode is null");
+                return;
+            }
+
             progress.Add(currentNode);
 
             if (depth + 1 < range)

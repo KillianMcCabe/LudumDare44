@@ -770,9 +770,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ace62f26dd229ac479dac13d06325c7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelStartDelay: 2
-  turnDelay: 0.1
-  playerFoodPoints: 100
   _enemiesMovingPanel: {fileID: 592937544}
   _playerSpawnPositions:
   - {fileID: 2505008}

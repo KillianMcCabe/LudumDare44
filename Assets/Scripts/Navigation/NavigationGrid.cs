@@ -48,7 +48,7 @@ namespace PaperDungeons
         private int gridMinWorldY = int.MaxValue;
         private int gridMaxWorldY = int.MinValue;
 
-        private bool _lightingDirtied = false;
+        private bool _lightingDirtied = true;
 
         private void Awake()
         {
@@ -59,7 +59,7 @@ namespace PaperDungeons
             GenerateNodes();
         }
 
-        private void FixedUpdate()
+        private void LateUpdate()
         {
             if (_lightingDirtied)
             {
