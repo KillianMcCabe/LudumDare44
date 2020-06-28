@@ -40,7 +40,6 @@ namespace PaperDungeons
 
         private void HandleNodeVisibilityChange(bool isVisible)
         {
-            Debug.Log("HandleNodeVisibilityChange");
             _spriteRenderer.enabled = isVisible;
         }
 

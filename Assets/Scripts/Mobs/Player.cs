@@ -18,9 +18,8 @@ namespace PaperDungeons
         }
 
         private NavNode _clickedNavNode;
-        private List<NavNode> pathing;
+        private List<NavNode> _pathing;
         private List<NavNode> _nodesWithinMovementRange;
-        private List<NavNode> _nodesWithinView;
         private Coroutine pathingCoroutine;
 
         public bool HasKey = false;
@@ -33,8 +32,8 @@ namespace PaperDungeons
         private int health = 10;
 
         private State _state;
-        private int movementRemaining = 0;
-        private bool inCombat = false;
+        private int _movementRemaining = 0;
+        private bool _inCombat = false;
 
         protected override void Awake()
         {
@@ -62,15 +61,13 @@ namespace PaperDungeons
             switch (_state)
             {
                 case State.DecidingWhereToMoveOrAct:
-                    movementRemaining = speed;
-                    _nodesWithinMovementRange = Pathing.GetNodesWithinRange(NodePosition, movementRemaining);
+                    _movementRemaining = speed;
+                    _nodesWithinMovementRange = Pathing.GetNodesWithinRange(NodePosition, _movementRemaining);
                     // show highlight on selectable nodes within movement range
                     for (int i = 0; i < _nodesWithinMovementRange.Count; i++)
                     {
                         _nodesWithinMovementRange[i].Highlight = Color.yellow;
                     }
-
-                    _nodesWithinView = Pathing.GetNodesWithinRange(NodePosition, movementRemaining);
                     break;
             }
         }
@@ -97,11 +94,11 @@ namespace PaperDungeons
 
         private IEnumerator PathingCoroutine()
         {
-            while (pathing.Count > 0)
+            while (_pathing.Count > 0)
             {
                 // pop
-                NavNode nextNode = pathing[0];
-                pathing.RemoveAt(0);
+                NavNode nextNode = _pathing[0];
+                _pathing.RemoveAt(0);
 
                 // check if the path is blocked by an object (e.g. a door)
                 if (nextNode.InteractableObject != null && nextNode.Blocked)
@@ -160,6 +157,12 @@ namespace PaperDungeons
             if (_state != State.DecidingWhereToMoveOrAct || !acceptingInput)
                 return;
 
+            if (clickedNavNode.Mob != null && !(clickedNavNode.Mob is Enemy))
+            {
+                Debug.Log("Can't move there");
+                return;
+            }
+
             _clickedNavNode = clickedNavNode;
 
             if (_nodesWithinMovementRange == null || _nodesWithinMovementRange.Count <= 0)
@@ -171,7 +174,7 @@ namespace PaperDungeons
             NavNode moveToThisNode = null;
 
             // when in combat, only consider nodes within movement range
-            if (inCombat)
+            if (_inCombat)
             {
                 if (_nodesWithinMovementRange.Contains(clickedNavNode))
                 {
@@ -206,8 +209,8 @@ namespace PaperDungeons
 
             // Debug.Log("Moving to " + moveToThisNode.name);
 
-            pathing = Pathing.CalculatePath(NodePosition, moveToThisNode);
-            if (pathing != null)
+            _pathing = Pathing.CalculatePath(NodePosition, moveToThisNode);
+            if (_pathing != null)
             {
                 if (pathingCoroutine != null)
                 {
@@ -221,19 +224,19 @@ namespace PaperDungeons
 
         void OnDrawGizmos()
         {
-            if (pathing != null)
+            if (_pathing != null)
             {
-                for (int i = 0; i < pathing.Count; i++)
+                for (int i = 0; i < _pathing.Count; i++)
                 {
                     if (i == 0)
                     {
                         Gizmos.color = Color.green;
-                        Gizmos.DrawLine(NodePosition.WorldPositionVector3, pathing[i].WorldPositionVector3);
+                        Gizmos.DrawLine(NodePosition.WorldPositionVector3, _pathing[i].WorldPositionVector3);
                     }
                     else
                     {
                         Gizmos.color = Color.yellow;
-                        Gizmos.DrawLine(pathing[i-1].WorldPositionVector3, pathing[i].WorldPositionVector3);
+                        Gizmos.DrawLine(_pathing[i-1].WorldPositionVector3, _pathing[i].WorldPositionVector3);
                     }
                 }
             }
