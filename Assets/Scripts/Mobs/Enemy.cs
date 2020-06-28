@@ -53,7 +53,7 @@ namespace PaperDungeons
 
                     _isMoving = true;
 
-                    pathing = Pathing.CalculatePath(_currentNodePosition, GameManager.LocalPlayer.NodePosition);
+                    pathing = Pathing.CalculatePath(NodePosition, GameManager.LocalPlayer.NodePosition);
                     if (pathingCoroutine != null)
                     {
                         StopCoroutine(pathingCoroutine);
@@ -74,7 +74,7 @@ namespace PaperDungeons
             if (health <= 0)
             {
                 MessageLogController.Instance.AddMessage("You killed the Slime.");
-                _currentNodePosition.Mob = null;
+
                 GameManager.Instance.RemoveEnemyFromList(this);
                 GameObject.Destroy(gameObject);
             }

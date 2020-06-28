@@ -10,6 +10,7 @@ namespace PaperDungeons
     {
         public static Action<NavNode> OnNodeClicked;
         public Action OnBlocksLightStateChange;
+        public Action<bool> OnVisibilityChange;
 
         public int gCost;
         public int hCost;
@@ -78,12 +79,16 @@ namespace PaperDungeons
         public bool Visible
         {
             get { return _visible; }
-            set {
+            set
+            {
+                if (_visible == value)
+                    return;
+
                 _visible = value;
                 if (_visible)
-                {
                     _hasBeenSeen = true;
-                }
+
+                OnVisibilityChange?.Invoke(_visible);
 
                 UpdateSpriteRenderer();
             }
