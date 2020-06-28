@@ -103,7 +103,7 @@ namespace PaperDungeons
             SetState(State.Closed);
         }
 
-        #region IPunObservable implementation
+        #region PUN events
 
         [PunRPC]
         private void RPC_UpdateState(State newState)

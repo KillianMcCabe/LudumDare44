@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 namespace PaperDungeons
 {
@@ -16,18 +17,13 @@ namespace PaperDungeons
             Debug.Log("key is at " + currentNodePosition.WorldPosition);
         }
 
-        // Update is called once per frame
-        void Update()
-        {
-            
-        }
-
         public override void Interact()
         {
             GameManager.LocalPlayer.HasKey = true;
             currentNodePosition.InteractableObject = null;
             MessageLogController.Instance.AddMessage("You found a key.");
-            GameObject.Destroy(gameObject);
+
+            NetworkGC.Instance.DestroyPhotonView(photonView);
         }
     }
 }

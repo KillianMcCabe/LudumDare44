@@ -54,14 +54,22 @@ namespace PaperDungeons
         {
             Debug.Log("recaulculating lighting...");
 
+            int navNodeCount = 0;
+            int navNodeBlocksLightCount = 0;
+
             // start by resetting all nodes to not visible
             foreach (NavNode navNode in NavigationGrid.Instance.NodeGrid)
             {
                 if (navNode != null)
                 {
                     navNode.Visible = false;
+                    navNodeCount ++;
+                    if (navNode.BlocksLight)
+                        navNodeBlocksLightCount ++;
                 }
             }
+
+            Debug.Log($"{navNodeCount} nodes, {navNodeBlocksLightCount} of which block light");
 
             // check all light nodes for visibility
             foreach (LightNode lightNode in _lightNodeGrid)
