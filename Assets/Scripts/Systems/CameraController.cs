@@ -10,6 +10,7 @@ namespace PaperDungeons
         public Transform FocusOnObject;
 
         private Vector3 focusOffset;
+        private Vector3 zoomPosition;
 
         // TODO: replace with some form of collider
         private const float CameraPanXRange = 80f;
@@ -19,9 +20,9 @@ namespace PaperDungeons
         private const float CameraPanDeceleration = 20f;
         private const float CameraPanMaxVelocity = 30f;
 
-        private const float CameraZoomAcceleration = 40f;
-        private const float CameraZoomDeceleration = 10f;
-        private const float CameraZoomMaxVelocity = 15f;
+        private const float CameraZoomAcceleration = 0.5f;
+        private const float CameraZoomDeceleration = 8f;
+        private const float CameraZoomMaxVelocity = 8f;
 
         private const float MinCameraSize = 2f;
         private const float MaxCameraSize = 8f;
@@ -98,9 +99,10 @@ namespace PaperDungeons
 
         private void UpdateZoom()
         {
-            _zoomVelocity += -Input.mouseScrollDelta.y * CameraZoomAcceleration * Time.deltaTime;
+            _zoomVelocity += -Input.mouseScrollDelta.y * CameraZoomAcceleration;
             if (Input.mouseScrollDelta.y == 0)
             {
+                zoomPosition = Input.mousePosition;
                 _zoomVelocity = Mathf.MoveTowards(_zoomVelocity, 0, CameraZoomDeceleration * Time.deltaTime);
             }
 
@@ -128,8 +130,8 @@ namespace PaperDungeons
 
             // update camera position to align to new zoom value
             float sizeChange = _camera.orthographicSize - prevSize;
-            float xCorrection = (Mathf.InverseLerp(0, Screen.width, Input.mousePosition.x) - 0.5f) * 2; // mouse X position in range (-1, +1)
-            float yCorrection = (Mathf.InverseLerp(0, Screen.height, Input.mousePosition.y) - 0.5f) * 2; // mouse y position in range (-1, +1)
+            float xCorrection = (Mathf.InverseLerp(0, Screen.width, zoomPosition.x) - 0.5f) * 2; // mouse X position in range (-1, +1)
+            float yCorrection = (Mathf.InverseLerp(0, Screen.height, zoomPosition.y) - 0.5f) * 2; // mouse y position in range (-1, +1)
 
             float aspectRatio = (float)Screen.width / (float)Screen.height;
             transform.position = new Vector3(
