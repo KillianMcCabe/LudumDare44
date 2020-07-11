@@ -19,11 +19,11 @@ namespace PaperDungeons
         private const float CameraPanDeceleration = 20f;
         private const float CameraPanMaxVelocity = 30f;
 
-        private const float CameraZoomAcceleration = 30f;
-        private const float CameraZoomDeceleration = 2f;
-        private const float CameraZoomMaxVelocity = 20f;
+        private const float CameraZoomAcceleration = 40f;
+        private const float CameraZoomDeceleration = 10f;
+        private const float CameraZoomMaxVelocity = 15f;
 
-        private const float MinCameraSize = 3f;
+        private const float MinCameraSize = 2f;
         private const float MaxCameraSize = 8f;
 
         private float _zoomVelocity = 0f;
@@ -123,7 +123,20 @@ namespace PaperDungeons
 
             _zoomNormalizedValue = Mathf.Clamp01(_zoomNormalizedValue + _zoomVelocity * Time.deltaTime);
 
+            float prevSize = _camera.orthographicSize;
             _camera.orthographicSize = Mathf.Lerp(MinCameraSize, MaxCameraSize, _zoomNormalizedValue);
+
+            // update camera position to align to new zoom value
+            float sizeChange = _camera.orthographicSize - prevSize;
+            float xCorrection = (Mathf.InverseLerp(0, Screen.width, Input.mousePosition.x) - 0.5f) * 2; // mouse X position in range (-1, +1)
+            float yCorrection = (Mathf.InverseLerp(0, Screen.height, Input.mousePosition.y) - 0.5f) * 2; // mouse y position in range (-1, +1)
+
+            float aspectRatio = (float)Screen.width / (float)Screen.height;
+            transform.position = new Vector3(
+                transform.position.x + (xCorrection * -sizeChange * aspectRatio),
+                transform.position.y + (yCorrection * -sizeChange),
+                transform.position.z
+            );
         }
 
         private void ClampCameraPositionToMapBounds()
