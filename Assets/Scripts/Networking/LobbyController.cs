@@ -13,6 +13,9 @@ namespace PaperDungeons
         private InputField _playerNickNameInput = null; //Input field so player can change their NickName
 
         [SerializeField]
+        private GameObject _loadingText = null;
+
+        [SerializeField]
         private Button _joinRoomButton = null; // button used for creating and joining a game.
 
         [SerializeField]
@@ -21,6 +24,7 @@ namespace PaperDungeons
         private void Start()
         {
             _playerNickNameInput.onValueChanged.AddListener(HandlePlayerNameUpdateInputChanged);
+            _loadingText.SetActive(true);
         }
 
         public override void OnConnectedToMaster() // Callback function for when the first connection is established successfully.
