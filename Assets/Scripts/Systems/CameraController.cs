@@ -12,6 +12,8 @@ namespace PaperDungeons
         private Vector3 focusOffset;
         private Vector3 zoomPosition;
 
+        private const int CameraDragButtonValue = 1;
+
         // TODO: replace with some form of collider
         private const float CameraPanXRange = 80f;
         private const float CameraPanYRange = 80f;
@@ -33,29 +35,45 @@ namespace PaperDungeons
 
         private Camera _camera;
 
+        private bool _mouseButtonHeld;
+        private Vector3 _prevMouseWorldPos;
+
         private void Awake()
         {
             _camera = GetComponent<Camera>();
         }
 
-        private void LateUpdate()
+        private void Update()
         {
-            // if (FocusOnObject != null)
-            // {
-            //     transform.position = new Vector3(FocusOnObject.position.x, FocusOnObject.position.y, zPos);
-            // }
-
-            if (Input.GetMouseButtonDown(1))
+            _mouseButtonHeld = Input.GetMouseButton(CameraDragButtonValue);
+            if (Input.GetMouseButtonDown(CameraDragButtonValue))
             {
-                // TODO: allow user to click middle mouse and drag
+                // store position of mouse when first held down
+                _prevMouseWorldPos = GetMouseWorldPosition();
             }
 
-            Vector3 cameraInput = CalculateCameraMotionInput();
-            UpdateMovementVelocity(cameraInput);
+            if (_mouseButtonHeld)
+            {
+                Vector3 currentMouseWorldPos = GetMouseWorldPosition();
+                Vector3 mouseMovement = currentMouseWorldPos - _prevMouseWorldPos;
+                transform.position -= new Vector3(mouseMovement.x, mouseMovement.y, 0);
 
+                // update prev mouse position
+                _prevMouseWorldPos = currentMouseWorldPos - new Vector3(mouseMovement.x, mouseMovement.y, 0);
+            }
+        }
+
+        private void FixedUpdate()
+        {
             UpdateZoom();
 
-            transform.position += _velocity * Time.deltaTime;
+            if (!_mouseButtonHeld)
+            {
+                Vector3 cameraInput = CalculateCameraMotionInput();
+                UpdateMovementVelocity(cameraInput);
+                transform.position += _velocity * Time.deltaTime;
+            }
+
             ClampCameraPositionToMapBounds();
         }
 
@@ -174,6 +192,32 @@ namespace PaperDungeons
             }
 
             return cameraMovementInput;
+        }
+
+        private Vector3 GetMouseWorldPosition()
+        {
+            Vector2 mousePos = Input.mousePosition;
+            return _camera.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, _camera.nearClipPlane));
+        }
+
+        void OnGUI()
+        {
+            Vector3 point = new Vector3();
+            Event   currentEvent = Event.current;
+            Vector2 mousePos = new Vector2();
+
+            // Get the mouse position from Event.
+            // Note that the y position from Event is inverted.
+            mousePos.x = currentEvent.mousePosition.x;
+            mousePos.y = _camera.pixelHeight - currentEvent.mousePosition.y;
+
+            point = _camera.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, _camera.nearClipPlane));
+
+            GUILayout.BeginArea(new Rect(20, 20, 250, 120));
+            GUILayout.Label("Screen pixels: " + _camera.pixelWidth + ":" + _camera.pixelHeight);
+            GUILayout.Label("Mouse position: " + mousePos);
+            GUILayout.Label("World position: " + point.ToString("F3"));
+            GUILayout.EndArea();
         }
     }
 }
