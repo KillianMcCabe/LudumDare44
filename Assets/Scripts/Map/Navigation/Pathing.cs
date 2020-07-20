@@ -15,7 +15,7 @@ namespace PaperDungeons
 
             if (startNode.Walkable && targetNode.Walkable)
             {
-                Heap<NavNode> openSet = new Heap<NavNode>(NavigationGrid.Instance.NodeGrid.Length);
+                Heap<NavNode> openSet = new Heap<NavNode>(MapManager.Instance.NavGrid.NodeGrid.Length);
                 HashSet<NavNode> closedSet = new HashSet<NavNode>();
                 openSet.Add(startNode);
                 

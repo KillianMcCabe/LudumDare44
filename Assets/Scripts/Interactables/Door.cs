@@ -32,10 +32,9 @@ namespace PaperDungeons
         [SerializeField]
         private State _state;
 
-        // Start is called before the first frame update
-        void Start()
+        private void Start()
         {
-            _occupiedNavNode = NavigationGrid.Instance.GetNode(new Vector2(transform.position.x, transform.position.y));
+            _occupiedNavNode = MapManager.Instance.NavGrid.GetNode(new Vector2(transform.position.x, transform.position.y));
             _occupiedNavNode.InteractableObject = this;
             _occupiedNavNode.BlocksLight = true;
 

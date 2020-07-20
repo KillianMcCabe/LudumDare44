@@ -12,7 +12,7 @@ namespace PaperDungeons
         // Start is called before the first frame update
         void Start()
         {
-            currentNodePosition = NavigationGrid.Instance.GetNode(new Vector2(transform.position.x, transform.position.y));
+            currentNodePosition = MapManager.Instance.NavGrid.GetNode(new Vector2(transform.position.x, transform.position.y));
             currentNodePosition.InteractableObject = this;
             Debug.Log("key is at " + currentNodePosition.WorldPosition);
         }

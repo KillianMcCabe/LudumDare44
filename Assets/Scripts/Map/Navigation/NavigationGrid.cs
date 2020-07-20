@@ -5,7 +5,7 @@ using UnityEngine.Tilemaps;
 
 namespace PaperDungeons
 {
-    public class NavigationGrid : SingletonMonoBehaviour<NavigationGrid>
+    public class NavigationGrid : MonoBehaviour
     {
         private const float zPos = -1;
 

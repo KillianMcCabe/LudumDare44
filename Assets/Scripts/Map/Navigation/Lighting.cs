@@ -18,8 +18,8 @@ namespace PaperDungeons
 
         public void InitialiseLightGrid(int gridMinWorldX, int gridMinWorldY)
         {
-            _lightGridSizeX = NavigationGrid.Instance.navGridSizeX - 1;
-            _lightGridSizeY = NavigationGrid.Instance.navGridSizeY - 1;
+            _lightGridSizeX = MapManager.Instance.NavGrid.navGridSizeX - 1;
+            _lightGridSizeY = MapManager.Instance.NavGrid.navGridSizeY - 1;
             _lightNodeGrid = new LightNode[_lightGridSizeX, _lightGridSizeY];
 
             // create and initialise all blocks in the light grid
@@ -36,8 +36,8 @@ namespace PaperDungeons
                     {
                         for (int j = 0; j <= 1; j++)
                         {
-                            if (NavigationGrid.Instance.NodeGrid[x + i, y + j] != null)
-                                newLightNode.navNodes.Add(NavigationGrid.Instance.NodeGrid[x + i, y + j]);
+                            if (MapManager.Instance.NavGrid.NodeGrid[x + i, y + j] != null)
+                                newLightNode.navNodes.Add(MapManager.Instance.NavGrid.NodeGrid[x + i, y + j]);
                         }
                     }
                     _lightNodeGrid[x, y] = newLightNode;
@@ -58,7 +58,7 @@ namespace PaperDungeons
             int navNodeBlocksLightCount = 0;
 
             // start by resetting all nodes to not visible
-            foreach (NavNode navNode in NavigationGrid.Instance.NodeGrid)
+            foreach (NavNode navNode in MapManager.Instance.NavGrid.NodeGrid)
             {
                 if (navNode != null)
                 {

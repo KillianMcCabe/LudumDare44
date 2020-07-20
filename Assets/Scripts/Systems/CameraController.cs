@@ -7,27 +7,21 @@ namespace PaperDungeons
 {
     public class CameraController : MonoBehaviour
     {
-        public Transform FocusOnObject;
+        private const int CameraDragButtonKeyValue = 1;
 
-        private Vector3 focusOffset;
-        private Vector3 zoomPosition;
-
-        private const int CameraDragButtonValue = 1;
-
-        // TODO: replace with some form of collider
-        private const float CameraPanXRange = 80f;
-        private const float CameraPanYRange = 80f;
-
-        private const float CameraPanAcceleration = 16f;
-        private const float CameraPanDeceleration = 20f;
+        private const float CameraPanAcceleration = 20f;
+        private const float CameraPanDeceleration = 25f;
         private const float CameraPanMaxVelocity = 30f;
 
         private const float CameraZoomAcceleration = 0.5f;
         private const float CameraZoomDeceleration = 8f;
         private const float CameraZoomMaxVelocity = 8f;
 
+        // zoom value bounds
         private const float MinCameraSize = 2f;
         private const float MaxCameraSize = 8f;
+
+        private Vector3 zoomPosition;
 
         private float _zoomVelocity = 0f;
         private float _zoomNormalizedValue = 0.5f; // range of 0 - 1
@@ -43,14 +37,16 @@ namespace PaperDungeons
             _camera = GetComponent<Camera>();
         }
 
-        private void Update()
+        private void LateUpdate()
         {
-            _mouseButtonHeld = Input.GetMouseButton(CameraDragButtonValue);
-            if (Input.GetMouseButtonDown(CameraDragButtonValue))
+            _mouseButtonHeld = Input.GetMouseButton(CameraDragButtonKeyValue);
+            if (Input.GetMouseButtonDown(CameraDragButtonKeyValue))
             {
                 // store position of mouse when first held down
                 _prevMouseWorldPos = GetMouseWorldPosition();
             }
+
+            UpdateZoom();
 
             if (_mouseButtonHeld)
             {
@@ -61,13 +57,7 @@ namespace PaperDungeons
                 // update prev mouse position
                 _prevMouseWorldPos = currentMouseWorldPos - new Vector3(mouseMovement.x, mouseMovement.y, 0);
             }
-        }
-
-        private void FixedUpdate()
-        {
-            UpdateZoom();
-
-            if (!_mouseButtonHeld)
+            else
             {
                 Vector3 cameraInput = CalculateCameraMotionInput();
                 UpdateMovementVelocity(cameraInput);
@@ -83,33 +73,33 @@ namespace PaperDungeons
             _velocity += input * CameraPanAcceleration * Time.deltaTime;
             _velocity = Vector3.ClampMagnitude(_velocity, CameraPanMaxVelocity);
 
-            // decelerate camera if no input on corresponding axis
+            // decelerate camera if no input on corresponding axis or input is pushing opposite direction
             float decelerationMaxDelta = CameraPanDeceleration * Time.deltaTime;
-            if (input.x == 0)
+            if (input.x == 0 || (Mathf.Sign(input.x) != Mathf.Sign(_velocity.x)))
             {
                 _velocity.x = Mathf.MoveTowards(_velocity.x, 0, decelerationMaxDelta);
             }
-            if (input.y == 0)
+            if (input.y == 0 || (Mathf.Sign(input.y) != Mathf.Sign(_velocity.y)))
             {
                 _velocity.y = Mathf.MoveTowards(_velocity.y, 0, decelerationMaxDelta);
             }
 
             // kill X velocity if camera hits max X pan range
-            if (transform.position.x <= -CameraPanXRange)
+            if (transform.position.x <= MapManager.Instance.MapBounds.minX)
             {
                 _velocity.x = Mathf.Clamp(_velocity.x, 0, CameraPanMaxVelocity);
             }
-            else if (transform.position.x >= CameraPanXRange)
+            else if (transform.position.x >= MapManager.Instance.MapBounds.maxX)
             {
                 _velocity.x = Mathf.Clamp(_velocity.x, -CameraPanMaxVelocity, 0);
             }
 
             // kill Y velocity if camera hits max Y pan range
-            if (transform.position.y <= -CameraPanYRange)
+            if (transform.position.y <= MapManager.Instance.MapBounds.minY)
             {
                 _velocity.y = Mathf.Clamp(_velocity.y, 0, CameraPanMaxVelocity);
             }
-            else if (transform.position.y >= CameraPanYRange)
+            else if (transform.position.y >= MapManager.Instance.MapBounds.maxY)
             {
                 _velocity.y = Mathf.Clamp(_velocity.y, -CameraPanMaxVelocity, 0);
             }
@@ -163,8 +153,8 @@ namespace PaperDungeons
         {
             // clamp position within bounds
             transform.position = new Vector3(
-                Mathf.Clamp(transform.position.x, -CameraPanXRange, CameraPanXRange),
-                Mathf.Clamp(transform.position.y, -CameraPanYRange, CameraPanYRange),
+                Mathf.Clamp(transform.position.x, MapManager.Instance.MapBounds.minX, MapManager.Instance.MapBounds.maxX),
+                Mathf.Clamp(transform.position.y, MapManager.Instance.MapBounds.minY, MapManager.Instance.MapBounds.maxY),
                 transform.position.z
             );
         }

@@ -134,7 +134,7 @@ namespace PaperDungeons
                     NodePosition = nextNode;
                 }
 
-                NavigationGrid.Instance.Lighting.Recalculate(this); // TODO: move into GameManager.cs
+                MapManager.Instance.NavGrid.Lighting.Recalculate(this); // TODO: move into GameManager.cs
             }
 
             // check if we stopped on an item

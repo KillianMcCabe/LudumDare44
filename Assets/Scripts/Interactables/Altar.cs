@@ -12,10 +12,10 @@ namespace PaperDungeons
         // Start is called before the first frame update
         void Start()
         {
-            NavNode node1 = NavigationGrid.Instance.GetNode(new Vector2(transform.position.x,     transform.position.y));
+            NavNode node1 = MapManager.Instance.NavGrid.GetNode(new Vector2(transform.position.x,     transform.position.y));
             node1.InteractableObject = this;
             node1.Blocked = true;
-            NavNode node2 = NavigationGrid.Instance.GetNode(new Vector2(transform.position.x + 1, transform.position.y));
+            NavNode node2 = MapManager.Instance.NavGrid.GetNode(new Vector2(transform.position.x + 1, transform.position.y));
             node2.InteractableObject = this;
             node2.Blocked = true;
         }

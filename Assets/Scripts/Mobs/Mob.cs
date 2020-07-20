@@ -49,7 +49,7 @@ namespace PaperDungeons
             set
             {
                 transform.position = value;
-                NodePosition = NavigationGrid.Instance.GetNode(transform.position);
+                NodePosition = MapManager.Instance.NavGrid.GetNode(transform.position);
             }
         }
 
@@ -64,7 +64,7 @@ namespace PaperDungeons
         protected virtual void Start()
         {
             // get current position on node grid
-            NodePosition = NavigationGrid.Instance.GetNode(transform.position);
+            NodePosition = MapManager.Instance.NavGrid.GetNode(transform.position);
         }
 
         protected virtual void OnDestroy()
