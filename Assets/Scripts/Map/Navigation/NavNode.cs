@@ -29,6 +29,7 @@ namespace PaperDungeons
         bool _blocksLight = false;
 
         private Color _highlight = new Color(0, 0, 0, 0);
+        private Color SemiFogColor = new Color(1, 1, 1, 0.5f);
 
         SpriteRenderer _spriteRenderer;
 
@@ -186,7 +187,7 @@ namespace PaperDungeons
                 if (_hasBeenSeen)
                 {
                     // semi-fog
-                    _fogTilemap.SetColor(WorldPositionVector3Int, new Color( 0.25f, 0.25f, 0.25f, 0.25f));
+                    _fogTilemap.SetColor(WorldPositionVector3Int, SemiFogColor);
                 }
             }
             else

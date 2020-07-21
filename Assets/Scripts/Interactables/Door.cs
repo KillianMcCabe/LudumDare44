@@ -7,8 +7,11 @@ namespace PaperDungeons
 {
     public class Door : InteractableObject
     {
-        // the nav-node which this object occupies
-        NavNode _occupiedNavNode = null;
+        public enum Rotation
+        {
+            Horizontal,
+            Vertical
+        }
 
         public enum State
         {
@@ -18,19 +21,16 @@ namespace PaperDungeons
         }
 
         [SerializeField]
-        SpriteRenderer _spriteRenderer = null;
+        private SpriteRenderer _spriteRenderer = null;
 
         [SerializeField]
-        Sprite _openSprite = null;
-
-        [SerializeField]
-        Sprite _closedSprite = null;
-
-        [SerializeField]
-        Sprite _lockedSprite = null;
+        private DoorData _doorData = null;
 
         [SerializeField]
         private State _state;
+
+        // the nav-node which this object occupies
+        private NavNode _occupiedNavNode = null;
 
         private void Start()
         {
@@ -39,6 +39,22 @@ namespace PaperDungeons
             _occupiedNavNode.BlocksLight = true;
 
             HandleStateChange();
+        }
+
+        private void OnValidate()
+        {
+            if (_state == State.Locked)
+            {
+                _spriteRenderer.sprite = _doorData.lockedSprite;
+            }
+            else if (_state == State.Closed)
+            {
+                _spriteRenderer.sprite = _doorData.closedSprite;
+            }
+            else
+            {
+                _spriteRenderer.sprite = _doorData.openSprite;
+            }
         }
 
         public void SetState(State state)
@@ -67,15 +83,15 @@ namespace PaperDungeons
         {
             if (_state == State.Locked)
             {
-                _spriteRenderer.sprite = _lockedSprite;
+                _spriteRenderer.sprite = _doorData.lockedSprite;
             }
             else if (_state == State.Closed)
             {
-                _spriteRenderer.sprite = _closedSprite;
+                _spriteRenderer.sprite = _doorData.closedSprite;
             }
             else
             {
-                _spriteRenderer.sprite = _openSprite;
+                _spriteRenderer.sprite = _doorData.openSprite;
             }
 
             _occupiedNavNode.Blocked = (_state == State.Locked);
