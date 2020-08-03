@@ -20,17 +20,18 @@ namespace PaperDungeons
             get { return _isMoving; }
         }
 
-        public int strength;
-        public int armor;
-        public int health;
-
         private State _state;
         private List<NavNode> pathing;
         Coroutine pathingCoroutine;
 
+        [SerializeField]
+        private MobStatsData _statsData = null;
+
         protected override void Start()
         {
             base.Start();
+
+            stats = _statsData.stats;
 
             GameManager.Instance.AddEnemyToList(this);
 
@@ -68,7 +69,7 @@ namespace PaperDungeons
         {
             _state = State.Aggravated;
 
-            int damage = Mathf.Max(attackPower - armor, 0);
+            int damage = Mathf.Max(attackPower - attributes.armor, 0);
             health -= damage;
             MessageLogController.Instance.AddMessage($"You dealt {damage} damage to the Slime.");
             if (health <= 0)
@@ -102,7 +103,7 @@ namespace PaperDungeons
                     if (nextNode.Mob is Player)
                     {
                         // attack the player
-                        nextNode.Mob.ReceiveAttack(strength);
+                        nextNode.Mob.ReceiveAttack(stats.strength);
                     }
                     _isMoving = false;
                     yield break;

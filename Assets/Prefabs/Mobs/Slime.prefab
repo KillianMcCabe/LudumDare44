@@ -99,6 +99,7 @@ MonoBehaviour:
   strength: 4
   armor: 0
   health: 6
+  _statsData: {fileID: 11400000, guid: 12852a1b21e496146b95465429604383, type: 2}
 --- !u!114 &4748408144638163465
 MonoBehaviour:
   m_ObjectHideFlags: 0

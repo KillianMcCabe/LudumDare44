@@ -14,8 +14,12 @@ namespace PaperDungeons
         protected PhotonView _photonView;
         protected SpriteRenderer _spriteRenderer;
 
+        public int health;
+
+        protected MobStats stats;
+        protected MobAttributes attributes;
+
         private NavNode _currentNodePosition;
-        private MobStats _statsSheet;
 
         public NavNode NodePosition
         {
