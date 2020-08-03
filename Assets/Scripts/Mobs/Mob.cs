@@ -15,6 +15,7 @@ namespace PaperDungeons
         protected SpriteRenderer _spriteRenderer;
 
         private NavNode _currentNodePosition;
+        private MobStats _statsSheet;
 
         public NavNode NodePosition
         {
