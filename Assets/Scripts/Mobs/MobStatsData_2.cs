@@ -77,7 +77,7 @@ namespace PaperDungeons
                 list.RemoveRange(sz, cur - sz);
             else if(sz > cur)
             {
-                if(sz > list.Capacity)//this bit is purely an optimisation, to avoid multiple automatic capacity changes.
+                if(sz > list.Capacity) // this bit is purely an optimisation, to avoid multiple automatic capacity changes.
                 list.Capacity = sz;
                 list.AddRange(Enumerable.Repeat(c, sz - cur));
             }

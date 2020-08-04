@@ -103,7 +103,7 @@ namespace PaperDungeons
                     if (nextNode.Mob is Player)
                     {
                         // attack the player
-                        nextNode.Mob.ReceiveAttack(stats.strength);
+                        nextNode.Mob.ReceiveAttack(stats.GetStatValue(Stat.Type.Strength));
                     }
                     _isMoving = false;
                     yield break;

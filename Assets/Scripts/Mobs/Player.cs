@@ -29,7 +29,6 @@ namespace PaperDungeons
         private int speed = 6;
         private int strength = 5;
         private int armor = 2;
-        private int health = 10;
 
         private State _state;
         private int _movementRemaining = 0;
