@@ -12,6 +12,11 @@ namespace PaperDungeons
         public MobStats stats;
         public MobAttributes attributes;
 
+        private void OnValidate()
+        {
+            stats.OnValidate();
+        }
+
         // TODO: list of attacks & spells
     }
 }

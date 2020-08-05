@@ -1,11 +1,15 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 namespace PaperDungeons
 {
     public class CharacterCreationPanel : MonoBehaviour
     {
         [Header("Child components")]
+
+        [SerializeField]
+        private TMPro.TMP_InputField _nameTextInput = null;
 
         [SerializeField]
         private Transform _statsListTransform = null;
@@ -36,6 +40,8 @@ namespace PaperDungeons
 
                 statRows.Add(statType, statRow);
             }
+
+            _nameTextInput.onEndEdit.AddListener(HandleNameChange);
         }
 
         private void Start()
@@ -59,12 +65,23 @@ namespace PaperDungeons
 
         private void RefreshView()
         {
-            _unspentStatPointText.text = $"You have {LocalCharacterStats.UnspentStatPoints} unspent stat points available.";
+            _nameTextInput.text = PhotonNetwork.NickName;
+
+            if (LocalCharacterStats.UnspentStatPoints > 0)
+                _unspentStatPointText.text = $"<color=red>You have {LocalCharacterStats.UnspentStatPoints} unspent stat points available.</color>";
+            else
+                _unspentStatPointText.text = "";
 
             foreach (CharacterCreationStatRow statRow in statRows.Values)
             {
                 statRow.RefreshView();
             }
+        }
+
+        private void HandleNameChange(string newName)
+        {
+            PhotonNetwork.NickName = newName;
+            PlayerPrefsExt.NickName = newName;
         }
     }
 }

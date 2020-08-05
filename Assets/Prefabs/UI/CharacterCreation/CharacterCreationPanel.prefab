@@ -698,6 +698,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4e28c6a69f09cd45a8ce6819b7900e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _nameTextInput: {fileID: 3346982877047607954}
   _statsListTransform: {fileID: 8266197983196959040}
   _unspentStatPointText: {fileID: 8772128393805465348}
   _statsRowPrefab: {fileID: 3678337735058479370, guid: 42ce3029e7785ef45b8cafbcb198a8d2,

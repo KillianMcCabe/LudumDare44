@@ -12,23 +12,6 @@ namespace PaperDungeons
         public float maxX = 10;
         public float maxY = 10;
 
-        // public float MinX
-        // {
-        //     get { return _minX; }
-        // }
-        // public float MinY
-        // {
-        //     get { return _minY; }
-        // }
-        // public float MaxX
-        // {
-        //     get { return _maxX; }
-        // }
-        // public float MaxY
-        // {
-        //     get { return _maxY; }
-        // }
-
         public Vector3 TopLeft
         {
             get { return new Vector3(minX, maxY); }

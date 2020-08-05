@@ -33,22 +33,16 @@ namespace PaperDungeons
             _joinRoomButton.gameObject.SetActive(true);
 
             // check for player name saved to player prefs
-            if (PlayerPrefs.HasKey("NickName"))
+            if (string.IsNullOrEmpty(PlayerPrefsExt.NickName))
             {
-                if (PlayerPrefs.GetString("NickName") == "")
-                {
-                    PhotonNetwork.NickName = "Player " + Random.Range(0, 1000); //random player name when not set
-                }
-                else
-                {
-                    PhotonNetwork.NickName = PlayerPrefs.GetString("NickName"); //get saved player name
-                }
+                PhotonNetwork.NickName = "Player " + Random.Range(0, 1000); // random player name when not set
             }
             else
             {
-                PhotonNetwork.NickName = "Player " + Random.Range(0, 1000); //random player name when not set
+                PhotonNetwork.NickName = PlayerPrefs.GetString("NickName"); // get saved player name
             }
-            _playerNickNameInput.text = PhotonNetwork.NickName; //update input field with player name
+
+            _playerNickNameInput.text = PhotonNetwork.NickName; // update input field with player name
         }
 
         public void JoinRoom() // Paired to the JoinRoon button
@@ -91,7 +85,7 @@ namespace PaperDungeons
         private void HandlePlayerNameUpdateInputChanged(string nameInput) //input function for player name. paired to player name input field
         {
             PhotonNetwork.NickName = nameInput;
-            PlayerPrefs.SetString("NickName", nameInput);
+            PlayerPrefsExt.NickName = nameInput;
         }
     }
 }

@@ -107,7 +107,12 @@ namespace PaperDungeons
 
         private void UpdateZoom()
         {
-            _zoomVelocity += -Input.mouseScrollDelta.y * CameraZoomAcceleration;
+            // ensure mouse is on screen for reading zoom input
+            if (Input.mousePosition.x >= 0 && Input.mousePosition.y >= 0 && Input.mousePosition.x <= Screen.width && Input.mousePosition.y <= Screen.height)
+            {
+                _zoomVelocity += -Input.mouseScrollDelta.y * CameraZoomAcceleration;
+            }
+
             if (Input.mouseScrollDelta.y == 0)
             {
                 zoomPosition = Input.mousePosition;

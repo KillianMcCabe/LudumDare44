@@ -13,11 +13,22 @@ MonoBehaviour:
   m_Name: Slime
   m_EditorClassIdentifier: 
   stats:
-    strength: 10
-    dexterity: 8
-    intelligence: 8
-    constitution: 8
-    wits: 8
+    _statList:
+    - name: Strength
+      type: 0
+      value: 10
+    - name: Dexterity
+      type: 1
+      value: 8
+    - name: Intelligence
+      type: 2
+      value: 8
+    - name: Constitution
+      type: 3
+      value: 8
+    - name: Wits
+      type: 4
+      value: 8
   attributes:
     armor: 6
     initiative: 1
